@@ -178,6 +178,22 @@ try {
     });
   }
   await db.prepare("DELETE FROM rate_limits").run();
+  await page.setViewportSize({ width: 960, height: 760 });
+  for (const tab of ["overview", "events", "settings", "tools"]) {
+    await page.locator(`[data-tab=${tab}]`).click();
+    await page.waitForFunction(
+      (id) => !document.querySelector("#" + id).hasAttribute("aria-busy"),
+      tab,
+    );
+    assert.ok(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+      ),
+      `Reference-width overflow: ${tab}`,
+    );
+    await page.screenshot({ path: `docs/screenshots/reference-960-${tab}.png`, fullPage: true });
+  }
+  await db.prepare("DELETE FROM rate_limits").run();
   await page.setViewportSize({ width: 390, height: 844 });
   for (const tab of pages) {
     await page.locator(`[data-tab=${tab}]`).click();

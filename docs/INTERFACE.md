@@ -30,6 +30,8 @@ As capturas usam uma conta isolada de testes. Não há atividades fictícias no 
 
 ## Validação
 
-`npm run check`: 44 testes. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: todas as páginas em desktop e celular, sem exceções JavaScript ou overflow horizontal, com operações de memória, PDF, especialista local e personalidade. Em [mobile.png](screenshots/mobile.png), a navegação lateral é convertida para faixa horizontal para preservar legibilidade.
+`npm run check`: 44 testes. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: todas as páginas em desktop e celular; centro de comando, tempo, proteção e estúdio também em 960 px, sem exceções JavaScript ou overflow horizontal, com operações de memória, PDF, especialista local e personalidade. Em [mobile.png](screenshots/mobile.png), a navegação lateral é convertida para faixa horizontal para preservar legibilidade.
 
 O cérebro permanece em repositório separado. Nenhum arquivo de `/workspace/Cronos` foi alterado.
+
+Capturas adicionais na largura aproximada da referência: [centro de comando](screenshots/reference-960-overview.png), [tempo](screenshots/reference-960-events.png), [proteção](screenshots/reference-960-settings.png) e [estúdio](screenshots/reference-960-tools.png).

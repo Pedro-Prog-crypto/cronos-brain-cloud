@@ -51,4 +51,4 @@ PDF gerado no teste foi extraído de verdade. Visão, transcrição, síntese, g
 
 ## Interface 0.4.0
 
-Navegador: 12 páginas em 1440 e 390 px sem overflow horizontal ou exceções JavaScript. Exercitados login/logout, memória/edição/histórico, atlas, gráfico, PDF real, filtro e execução de especialista local, persistência de personalidade entre páginas. A API de personalidade foi testada para limites de entrada, isolamento entre contas, bloqueio de leitor e histórico de versões. As capturas usam uma conta descartável de teste e não representam inferências externas.
+Navegador: 12 páginas em 1440 e 390 px, mais quatro páginas densas em 960 px sem overflow horizontal ou exceções JavaScript. Exercitados login/logout, memória/edição/histórico, atlas, gráfico, PDF real, filtro e execução de especialista local, persistência de personalidade entre páginas. A API de personalidade foi testada para limites de entrada, isolamento entre contas, bloqueio de leitor e histórico de versões. As capturas usam uma conta descartável de teste e não representam inferências externas.
