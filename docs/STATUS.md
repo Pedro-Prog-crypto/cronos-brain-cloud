@@ -1,6 +1,6 @@
-# Resultado por fase — versão 0.4.3
+# Resultado por fase — versão 0.4.4
 
-As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.3 melhora os controles de permissão e entrega de lembretes no painel. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
+As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.4 acrescenta interações, recorrência na interface, pesquisa acadêmica e presença autenticada da ponte do Desktop. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
 
 | Fase | Implementado e verificado localmente | Limites e configuração pendente |
 |---|---|---|
@@ -12,14 +12,14 @@ As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e
 | 6 — Especialistas | Os 40 têm despacho para modelo, ferramentas, memória, agenda, política ou dispositivo; ferramentas permitidas verificadas | Qualidade e disponibilidade cognitiva exigem testes reais; catálogo mantém estado parcial, sem alegar 40 IAs operacionais |
 | 7 — Autonomia | Agenda, metas, silêncio, recorrência, opt-in, Cron declarado a cada 15 min, fila de webhook assinado com tentativas limitadas | Publicar Cron; configurar receptor autorizado; extração automática de compromissos em chat e replanejamento ainda pendentes |
 | 8 — Multimodal | PDF real; conectores de visão, geração, transcrição, voz, áudio por transcrição, vídeo por quadros; feeds RSS/Atom e Commons | Serviços externos não validados; sem OCR, captura contínua, análise acústica ou cobertura integral de vídeo; notícias preservam datas/fontes, mas não têm veracidade garantida |
-| 9 — Integração | Cliente de API e executor por callbacks com permissões, fila, expiração e resultados | Desktop continua separado por instrução do usuário; aplicativo receptor precisa instalar os callbacks |
-| 10 — Auditoria | 44 testes locais passando; navegador desktop/celular; PDF extraído; build de publicação em dry-run | Auditoria independente, carga e testes reais de inferência, pesquisa, entrega externa e recuperação remota |
+| 9 — Integração | Cliente de API e executor por callbacks com permissões, fila, expiração e resultados | Ponte local confirma presença; o aplicativo Desktop continua separado e precisa incorporar o cliente/callbacks para usar as capacidades dentro dele |
+| 10 — Auditoria | 46 testes locais passando; navegador desktop/celular; PDF extraído; build de publicação em dry-run | Auditoria independente, carga e testes reais de inferência, pesquisa, entrega externa e recuperação remota |
 
 ## Validação
 
-`npm run check`: TypeScript/build e 44 testes aprovados. Inferência, mídia remota e notificações são testadas com fixtures de transporte isoladas; extração de PDF, banco, indexação e cálculos são reais. Não existe provedor simulado no código de produção.
+`npm run check`: TypeScript/build e 46 testes aprovados. Inferência, mídia remota e notificações são testadas com fixtures de transporte isoladas; extração de PDF, banco, indexação e cálculos são reais. Não existe provedor simulado no código de produção.
 
-`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 809 KiB comprimidos na última validação. Não houve publicação. Migrações até 0006 aplicadas no banco local.
+`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 809 KiB comprimidos na última validação. Não houve publicação. Migrações até 0007 aplicadas no banco local.
 
 ## Bloqueio externo atual
 
@@ -29,7 +29,7 @@ As capacidades multimodais exigem um serviço compatível escolhido e verificado
 
 Configuração e limites: [CAPACIDADES.md](CAPACIDADES.md) e [PUBLICACAO.md](PUBLICACAO.md).
 
-## Interface 0.4.0
+## Interface 0.4.4
 
 Doze páginas reconstruídas a partir da imagem: centro de comando, atlas, especialistas, modelos, tempo/autonomia, proteção, pesquisa, estúdio, continuidade, diagnóstico, personalidade e integração. Preferências de estilo persistem como memória semântica versionada e influenciam as respostas. As limitações externas da tabela continuam válidas.
 

@@ -79,6 +79,8 @@ textarea {
   font: inherit;
 }
 button {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -97,14 +99,22 @@ button {
     0 1px 4px #0005;
   transition:
     border-color 0.15s,
-    background 0.15s;
+    background 0.15s,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 button:hover {
   border-color: #6f74c6;
   background: #132b43;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px #111b5270;
+}
+button:active {
+  transform: translateY(1px) scale(0.98);
 }
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+[data-go][role="button"]:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 3px;
 }
@@ -410,17 +420,8 @@ nav button.active .icon {
   min-height: 65px;
   margin: 0 0 15px -186px;
   width: calc(100% + 186px);
-  padding: 0 3px 13px;
+  padding: 0 3px 13px 78px;
   border-bottom: 1px solid #153851;
-}
-.page-number {
-  font-size: 40px;
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: -2px;
-  color: #b0a3ff;
-  text-shadow: 0 0 15px #6a31ce45;
-  min-width: 49px;
 }
 .page-heading p {
   margin: 3px 0 0;
@@ -452,7 +453,80 @@ nav button.active .icon {
     0 0 0 1px #020810;
   min-width: 0;
   overflow-wrap: anywhere;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
 }
+.panel:hover {
+  border-color: #3d6190;
+  box-shadow: inset 0 0 0 3px #020b14, 0 8px 26px #04062480, 0 0 15px #382e8950;
+}
+[data-go][role="button"] {
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+[data-go][role="button"]:hover {
+  transform: translateY(-3px);
+  border-color: #8a53da;
+  box-shadow: 0 7px 20px #2b146b70;
+}
+[data-go][role="button"]:active { transform: scale(.98); }
+.tab.page-enter {
+  animation: page-enter 0.38s cubic-bezier(.2,.8,.2,1) both;
+}
+.tab.page-enter > :not(.page-heading) {
+  animation: panel-enter 0.45s cubic-bezier(.2,.8,.2,1) both;
+}
+.tab.page-enter > :nth-child(3) { animation-delay: 55ms; }
+.tab.page-enter > :nth-child(4) { animation-delay: 95ms; }
+.tab.page-enter > :nth-child(5) { animation-delay: 135ms; }
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes panel-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.click-ripple {
+  position: absolute;
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #9c73ff80;
+  pointer-events: none;
+  animation: click-ripple .52s ease-out forwards;
+}
+@keyframes click-ripple {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  to { transform: translate(-50%, -50%) scale(10); opacity: 0; }
+}
+.notice-enter { animation: notice-enter .28s ease-out both; }
+@keyframes notice-enter {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.research-controls:not(:empty) {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.research-controls .tag-list { margin-top: 8px; }
+.desktop-connection {
+  margin: 16px 0;
+  padding: 13px;
+  border: 1px solid #465985;
+  border-radius: 7px;
+  background: #101b3360;
+}
+.desktop-connection .item.connected {
+  border-color: var(--good);
+  color: #7cf9d7;
+  box-shadow: 0 0 16px #05d6a32e;
+}
+.desktop-connection .toolbar { margin: 10px 0; }
+.desktop-connection pre { white-space: pre-wrap; }
+.source-card { transition: border-color .2s ease, transform .2s ease; }
+.source-card:hover { border-color: #814dcc; transform: translateY(-2px); }
 .panel > p.muted {
   font-size: 11px;
 }
@@ -1974,10 +2048,7 @@ footer {
     gap: 9px;
     min-height: 64px;
     align-items: center;
-  }
-  .page-number {
-    font-size: 32px;
-    min-width: 38px;
+    padding-left: 3px;
   }
   .page-heading h1 {
     font-size: 20px;
@@ -2198,6 +2269,7 @@ footer {
   * {
     scroll-behavior: auto !important;
     transition: none !important;
+    animation: none !important;
   }
 }
 

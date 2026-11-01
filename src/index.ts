@@ -26,6 +26,16 @@ async function route(r: Request, env: Env): Promise<Response> {
   }
   const p = await authenticate(r,env);
   await rateLimit(env.DB,`user:${p.userId}`,60);
+  if (path === '/v1/devices/heartbeat' && method === 'POST') {
+    const b=await body(r,z.object({client:z.string().trim().min(1).max(80)}).strict());
+    await env.DB.prepare('INSERT INTO device_presence(device_id,last_seen_at,client) VALUES (?,?,?) ON CONFLICT(device_id) DO UPDATE SET last_seen_at=excluded.last_seen_at,client=excluded.client').bind(p.deviceId,Date.now(),b.client).run();
+    return json({connected:true,deviceId:p.deviceId});
+  }
+  if (path === '/v1/devices/connections' && method === 'GET') {
+    owner(p);
+    const rows=(await env.DB.prepare('SELECT d.id,d.name,d.role,d.revoked_at,pr.last_seen_at,pr.client FROM devices d LEFT JOIN device_presence pr ON pr.device_id=d.id WHERE d.user_id=? ORDER BY d.name').bind(p.userId).all()).results;
+    return json({devices:rows.map(row=>({...row,online:!row.revoked_at&&typeof row.last_seen_at==='number'&&Date.now()-row.last_seen_at<60000}))});
+  }
   if (!['GET','HEAD'].includes(method) && path!=='/v1/auth/logout') owner(p);
   const operation=await operations(r,env,p); if(operation) return operation;
   const store = new D1MemoryStore(env.DB);

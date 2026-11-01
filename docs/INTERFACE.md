@@ -1,6 +1,6 @@
-# Interface CRONOS — 0.4.1
+# Interface CRONOS — 0.4.4
 
-O painel em `/admin` foi reconstruído seguindo as doze telas da imagem fornecida pelo usuário. Mantém a identidade azul/ciano/violeta, fundo espacial, navegação lateral, numeração, painéis, diagramas e divisão dos conteúdos. Ícones e cérebro são SVG; a galáxia é desenhada em Canvas. São reconstruções das ilustrações: sem os arquivos gráficos originais, não se alega identidade pixel a pixel.
+O painel em `/admin` foi reconstruído seguindo as doze telas da imagem fornecida pelo usuário. Mantém a identidade azul/ciano/violeta, fundo espacial, navegação lateral, painéis, diagramas e divisão dos conteúdos. Ícones e cérebro são SVG; a galáxia é desenhada em Canvas. São reconstruções das ilustrações: sem os arquivos gráficos originais, não se alega identidade pixel a pixel.
 
 | Página | Implementação e captura |
 | --- | --- |
@@ -25,12 +25,16 @@ As capturas usam uma conta isolada de testes. Não há atividades fictícias no 
 - O estilo é guardado como memória semântica versionada e orienta a apresentação do chat e dos especialistas textuais. Não representa treinamento de pesos. Exclusão dessa memória restaura os padrões.
 - A composição usa Markdown; exportação gera arquivo `.md`. O histórico de requisições mostra apenas método, caminho sem query, status e tempo desta sessão. Credenciais e corpos não são registrados nesse histórico.
 - Upload, prévia e composição ficam na memória do navegador. O envio ocorre ao executar a ferramenta; a prévia de imagem usa Blob local revogado no logout. Não há persistência em localStorage de sessão ou composição.
-- Artigos acadêmicos, monitoramento contínuo e alertas de pesquisa permanecem desabilitados. Não há clonagem de voz, identificação de falantes, transcrição automática em tempo real, aprovação automática de notícias ou integração automática com o desktop.
+- Artigos acadêmicos usam o Crossref quando `WEB_ENABLED=true`; alertas e monitoramento são verificações manuais desta sessão, sem execução em segundo plano. Não há clonagem de voz, identificação de falantes, transcrição automática em tempo real, aprovação automática de notícias ou integração automática com o desktop.
 - Limites de arquivos, provedores e necessidade de credenciais continuam documentados em [CAPACIDADES.md](CAPACIDADES.md). O painel não ativa serviços externos nem configura segredos.
+
+Os números grandes da imagem de referência foram removidos do painel. Fluxo de orquestração, métricas e diagrama de modelos abrem páginas reais por clique ou teclado. Botões respondem com estado visual e as páginas entram com transições, respeitando a preferência de movimento reduzido.
+
+A ponte do CRONOS Desktop tem cadastro, arquivo de conexão, presença autenticada e estado online verificável. O código do aplicativo Desktop não foi alterado.
 
 ## Validação
 
-`npm run check`: 44 testes. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: todas as páginas em desktop e celular; centro de comando, tempo, proteção e estúdio também em 960 px, sem exceções JavaScript ou overflow horizontal, com operações de memória, PDF, especialista local e personalidade. Em [mobile.png](screenshots/mobile.png), a navegação lateral é convertida para faixa horizontal para preservar legibilidade.
+`npm run check`: 46 testes. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: todas as páginas em desktop e celular; centro de comando, tempo, proteção e estúdio também em 960 px, sem exceções JavaScript ou overflow horizontal, com operações de memória, PDF, especialista local e personalidade. Em [mobile.png](screenshots/mobile.png), a navegação lateral é convertida para faixa horizontal para preservar legibilidade.
 
 O cérebro permanece em repositório separado. Nenhum arquivo de `/workspace/Cronos` foi alterado.
 

@@ -230,7 +230,6 @@
         <div class="page-content">
           <section id="overview" class="tab">
             <div class="page-heading">
-              <span class="page-number">01</span>
               <div>
                 <h1>Centro de comando</h1>
                 <p>Orquestração completa do CRONOS BRAIN CLOUD</p>
@@ -255,35 +254,35 @@
                   verificações.
                 </p>
                 <div class="flow">
-                  <div class="flow-step">
+                  <div class="flow-step" data-go="chat" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-chat" /></svg
                     ><strong>Pedido</strong
                     ><small>Entrada do usuário ou de uma tarefa</small>
                   </div>
                   <span class="flow-arrow">→</span>
-                  <div class="flow-step">
+                  <div class="flow-step" data-go="memory" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-database" /></svg
                     ><strong>Memórias</strong
                     ><small>Recupera contexto relevante</small>
                   </div>
                   <span class="flow-arrow">→</span>
-                  <div class="flow-step">
+                  <div class="flow-step" data-go="agents" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-agents" /></svg
                     ><strong>Especialistas</strong
                     ><small>Seleciona e orquestra as capacidades</small>
                   </div>
                   <span class="flow-arrow">→</span>
-                  <div class="flow-step">
+                  <div class="flow-step" data-go="diagnostics" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-shield" /></svg
                     ><strong>Verificação</strong
                     ><small>Verifica evidências e limitações</small>
                   </div>
                   <span class="flow-arrow">→</span>
-                  <div class="flow-step">
+                  <div class="flow-step" data-go="chat" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-file" /></svg
                     ><strong>Resposta</strong
@@ -299,7 +298,7 @@
               <article class="panel">
                 <h2>Conexão com CRONOS</h2>
                 <div class="connection-map">
-                  <div>
+                  <div data-go="integration" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-device" /></svg
                     ><strong>Este dispositivo</strong
@@ -307,7 +306,7 @@
                     ><span class="status good">Conectado</span>
                   </div>
                   <span class="duplex">⇄</span>
-                  <div>
+                  <div data-go="models" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-cloud" /></svg
                     ><strong>CRONOS BRAIN CLOUD</strong
@@ -380,7 +379,6 @@
           </section>
           <section id="graph" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">02</span>
               <div>
                 <h1>Atlas de memórias</h1>
                 <p>Seu conhecimento organizado e interconectado</p>
@@ -456,7 +454,6 @@
           </section>
           <section id="agents" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">03</span>
               <div>
                 <h1>Especialistas</h1>
                 <p>40 especialistas para pensar, criar e executar com você</p>
@@ -540,7 +537,6 @@
           </section>
           <section id="models" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">04</span>
               <div>
                 <h1>Modelos e ferramentas</h1>
                 <p>
@@ -566,13 +562,13 @@
                   Rotas entre provedores, com fallback e limites de utilização.
                 </p>
                 <div class="gateway-diagram">
-                  <div class="gateway-node">
+                  <div class="gateway-node" data-go="integration" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-device" /></svg
                     ><strong>CRONOS</strong><small>Seleção</small>
                   </div>
                   <span class="flow-arrow">→</span>
-                  <div class="gateway-node core">
+                  <div class="gateway-node core" data-go="diagnostics" role="button" tabindex="0">
                     <svg class="icon" aria-hidden="true">
                       <use href="#i-brain" /></svg
                     ><strong>Model Gateway</strong
@@ -580,17 +576,17 @@
                   </div>
                   <span class="branches">↗<br />→<br />↘</span>
                   <div class="gateway-providers">
-                    <div>
+                    <div data-go="diagnostics" role="button" tabindex="0">
                       <span class="provider-logo orange">☁</span
                       ><strong>Cloudflare</strong
                       ><span class="status warn">Configuração segura</span>
                     </div>
-                    <div>
+                    <div data-go="diagnostics" role="button" tabindex="0">
                       <span class="provider-logo white">groq</span
                       ><strong>Groq</strong
                       ><span class="status warn">Configuração segura</span>
                     </div>
-                    <div>
+                    <div data-go="diagnostics" role="button" tabindex="0">
                       <span class="provider-logo violet">⇆</span
                       ><strong>OpenRouter</strong
                       ><span class="status warn">Configuração segura</span>
@@ -661,7 +657,6 @@
           </section>
           <section id="events" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">05</span>
               <div>
                 <h1>Tempo e autonomia</h1>
                 <p>Planeje, acompanhe e automatize suas tarefas</p>
@@ -794,6 +789,7 @@
                     ><label class="check"
                       ><input type="checkbox" name="notify" />Autorizar lembrete
                       interno</label
+                    ><label>Repetir após conclusão<select name="recurrenceDays"><option value="0">Não repetir</option><option value="1">Todo dia</option><option value="7">Toda semana</option><option value="14">A cada 2 semanas</option><option value="30">A cada 30 dias</option></select></label
                     ><button class="primary">Registrar</button>
                   </form>
                 </article>
@@ -827,7 +823,6 @@
           </section>
           <section id="settings" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">06</span>
               <div>
                 <h1>Núcleo e proteção</h1>
                 <p>Segurança, dispositivos e controle da sua inteligência</p>
@@ -1058,7 +1053,6 @@
           </section>
           <section id="research" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">07</span>
               <div>
                 <h1>Pesquisa e notícias</h1>
                 <p>Busque, analise e acompanhe informações com suas fontes</p>
@@ -1086,35 +1080,15 @@
                 Notícias</button
               ><button type="button" data-research-mode="Imagens" class="">
                 Imagens</button
-              ><button
-                type="button"
-                disabled
-                title="Esta capacidade ainda não está integrada"
-              >
+              ><button type="button" data-research-mode="Artigos acadêmicos">
                 Artigos acadêmicos</button
-              ><button
-                type="button"
-                disabled
-                title="Esta capacidade ainda não está integrada"
-              >
+              ><button type="button" data-research-mode="Fontes confiáveis">
                 Fontes confiáveis</button
-              ><button
-                type="button"
-                disabled
-                title="Esta capacidade ainda não está integrada"
-              >
+              ><button type="button" data-research-mode="Tendências">
                 Tendências</button
-              ><button
-                type="button"
-                disabled
-                title="Esta capacidade ainda não está integrada"
-              >
+              ><button type="button" data-research-mode="Alertas">
                 Alertas</button
-              ><button
-                type="button"
-                disabled
-                title="Esta capacidade ainda não está integrada"
-              >
+              ><button type="button" data-research-mode="Monitoramento">
                 Monitoramento
               </button>
             </div>
@@ -1142,6 +1116,7 @@
                       origem.
                     </p>
                   </form>
+                  <div id="research-controls" class="research-controls" aria-live="polite"></div>
                 </article>
                 <article class="panel">
                   <h2>Resultados encontrados</h2>
@@ -1197,7 +1172,6 @@
           </section>
           <section id="tools" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">08</span>
               <div>
                 <h1>Estúdio multimodal</h1>
                 <p>
@@ -1580,7 +1554,6 @@
           </section>
           <section id="memory" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">09</span>
               <div>
                 <h1>Memória e continuidade</h1>
                 <p>
@@ -1761,7 +1734,6 @@
           </section>
           <section id="diagnostics" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">10</span>
               <div>
                 <h1>Diagnóstico e limites</h1>
                 <p>
@@ -1832,7 +1804,6 @@
           </section>
           <section id="personality" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">11</span>
               <div>
                 <h1>Personalidade e aprendizado</h1>
                 <p>
@@ -1999,7 +1970,6 @@
           </section>
           <section id="integration" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">12</span>
               <div>
                 <h1>Integração corpo–cérebro</h1>
                 <p>Conecte o CRONOS Desktop ao CRONOS BRAIN CLOUD</p>
@@ -2024,6 +1994,18 @@
                     Gerencie os dispositivos autorizados a acessar o cérebro.
                   </p>
                   <div id="integration-devices"></div>
+                  <div class="desktop-connection">
+                    <h2>Conectar ao CRONOS Desktop</h2>
+                    <p class="muted">Prepare uma credencial exclusiva para a ponte local. O estado abaixo só indica conexão quando a ponte envia presença autenticada.</p>
+                    <div id="connection-status" class="item" aria-live="polite">Aguardando verificação.</div>
+                    <div class="toolbar">
+                      <button type="button" id="connect-desktop">Preparar conexão</button>
+                      <button type="button" id="check-desktop">Verificar conexão</button>
+                      <button type="button" id="download-desktop-config" hidden>Baixar configuração</button>
+                    </div>
+                    <pre id="desktop-pairing" hidden></pre>
+                    <p class="muted">Inicie a ponte com <code>node client/desktop-bridge.mjs cronos-desktop.json</code> na máquina do CRONOS. Guarde o arquivo baixado em privado.</p>
+                  </div>
                   <h2>Adicionar dispositivo</h2>
                   <form id="device-form">
                     <label>Nome<input name="name" required /></label
@@ -2069,7 +2051,7 @@
                     cérebro.
                   </p>
                   <div class="integration-flow">
-                    <div>
+                    <div data-go="integration" role="button" tabindex="0">
                       <svg class="icon" aria-hidden="true">
                         <use href="#i-device" /></svg
                       ><strong>CRONOS Desktop</strong
@@ -2079,7 +2061,7 @@
                       >Requisições<br />→<br /><small>API REST / JSON</small
                       ><br />←<br />Respostas</span
                     >
-                    <div>
+                    <div data-go="diagnostics" role="button" tabindex="0">
                       <svg class="icon" aria-hidden="true">
                         <use href="#i-cloud" /></svg
                       ><strong>CRONOS BRAIN CLOUD</strong
@@ -2087,19 +2069,19 @@
                     </div>
                   </div>
                   <div class="module-strip">
-                    <span
+                    <span data-go="agents" role="button" tabindex="0"
                       ><svg class="icon" aria-hidden="true">
                         <use href="#i-agents" /></svg
                       >40 especialistas</span
-                    ><span
+                    ><span data-go="memory" role="button" tabindex="0"
                       ><svg class="icon" aria-hidden="true">
                         <use href="#i-database" /></svg
                       >5 memórias</span
-                    ><span
+                    ><span data-go="graph" role="button" tabindex="0"
                       ><svg class="icon" aria-hidden="true">
                         <use href="#i-graph" /></svg
                       >Grafo</span
-                    ><span
+                    ><span data-go="tools" role="button" tabindex="0"
                       ><svg class="icon" aria-hidden="true">
                         <use href="#i-tools" /></svg
                       >Ferramentas</span
@@ -2164,7 +2146,6 @@
           </section>
           <section id="chat" class="tab" hidden>
             <div class="page-heading">
-              <span class="page-number">✦</span>
               <div>
                 <h1>Converse com CRONOS</h1>
                 <p>Uma identidade, todas as suas capacidades</p>
@@ -2247,7 +2228,7 @@
     <footer>
       <span>CRONOS BRAIN CLOUD</span
       ><span>Conhecimento conectado. Possibilidades expandidas.</span
-      ><span>v0.4.0</span>
+      ><span>v0.4.4</span>
     </footer>
   </body>
 </html>

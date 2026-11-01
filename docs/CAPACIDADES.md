@@ -37,6 +37,7 @@ Ferramentas em `/v1/tools/execute`:
 | memory.vector.search | query | Até seis correspondências por similaridade de cosseno |
 | news.search | query | Artigos recentes com data declarada pela fonte e URL |
 | images.search | query | Imagens com autoria, licença e referência |
+| academic.search | query | Metadados de publicações com DOI do Crossref; não verifica afirmações |
 
 Corpo máximo de ferramentas: 2 MB. Imagem/áudio/PDF até cerca de 1 MB. PDF até 40 páginas e 24 mil caracteres; documentos digitalizados sem texto retornam `pdf_requires_ocr`. O teste de PDF simples passou com aviso de fonte padrão do PDF.js; documentos com fontes não incorporadas/CJK precisam de validação adicional. PDFs são processados no event loop: limites de arquivo/página/imagem reduzem risco, mas isolamento dedicado para documentos hostis ainda é recomendado em produção.
 

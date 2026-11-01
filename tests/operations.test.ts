@@ -27,6 +27,19 @@ test('operações avançadas integradas no Worker/D1',async t=>{
     assert.equal((await req('/v1/diagnostics','GET',undefined,'invalid')).status,401);
     const js=await mf.dispatchFetch('https://brain.test/admin/app.js');assert.equal(js.status,200);assert.ok(!(await js.text()).includes(credential));
   });
+  await t.test('ponte do Desktop autentica, informa presença e pode ser revogada',async()=>{
+    const created=await req('/v1/devices','POST',{name:'CRONOS Desktop',role:'reader'});
+    assert.equal(created.status,201);
+    const id=created.data.id;
+    const reader=(await req('/v1/auth/sessions','POST',{deviceId:id,credential:created.data.credential})).data.accessToken;
+    assert.equal((await req('/v1/devices/heartbeat','POST',{client:'CRONOS Desktop bridge/test'},reader)).status,200);
+    const online=await req('/v1/devices/connections');
+    assert.equal(online.data.devices.find((d:any)=>d.id===id).online,true);
+    assert.equal((await req('/v1/devices/connections','GET',undefined,reader)).status,403);
+    assert.equal((await req('/v1/memory','POST',mem,reader)).status,403);
+    await req('/v1/devices/'+id,'DELETE');
+    assert.equal((await req('/v1/devices/heartbeat','POST',{client:'CRONOS Desktop bridge/test'},reader)).status,401);
+  });
   await t.test('versões, conflito otimista e atualização das relações automáticas',async()=>{
     const saved=await req('/v1/memory','POST',mem);memoryId=saved.data.id;assert.equal(saved.status,201);
     let graph=await req('/v1/knowledge/graph');assert.equal(graph.data.nodes.length,2);assert.equal(graph.data.edges.length,1);

@@ -28,7 +28,7 @@ JSON UTF-8. Autenticação: `Authorization: Bearer <token>`, exceto saúde e cri
 | GET | /v1/data/export | Exportação dos dados de domínio; owner obrigatório |
 | DELETE | /v1/data | `{confirm:"DELETE MY DATA"}`; remove usuário e seus dados |
 
-Todos os métodos de escrita exigem owner. UUIDs identificam os recursos. Datas de entrada exigem timezone explícito ISO 8601 e são normalizadas para UTC nos eventos.
+Todos os métodos de escrita exigem owner, exceto logout e heartbeat autenticado do próprio dispositivo. UUIDs identificam os recursos. Datas de entrada exigem timezone explícito ISO 8601 e são normalizadas para UTC nos eventos.
 
 Metadados das memórias:
 
@@ -40,8 +40,10 @@ Metadados das memórias:
 
 Busca de memória usa FTS5 com palavras/prefixos e ignora acentos. Múltiplas palavras na busca devem estar presentes; a recuperação automática no chat classifica correspondências por relevância. Pontuação não é interpretada como operador de busca. Consultas vazias listam registros recentes; consultas apenas com pontuação retornam lista vazia. A migração 0003 reconstrói o índice dos dados existentes e instala triggers para mantê-lo atualizado. Busca vetorial está disponível pelas ferramentas de embedding quando configuradas. A deduplicação considera usuário, tipo, conteúdo normalizado e metadados, preservando a primeira origem.
 
-O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente demonstrativo em `client/brain.ts` mantém integração futura separada do Desktop. As 61 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
+O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente em `client/brain.ts` e a ponte de presença em `client/desktop-bridge.mjs` ficam separados do Desktop. As 63 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
 
+
+GET `/v1/devices/connections` lista a última presença e o estado online dos dispositivos (owner); POST `/v1/devices/heartbeat` com `{client}` informa a presença do próprio dispositivo autenticado. A presença expira após 60 segundos sem heartbeat.
 
 ## Operações adicionadas na v0.2
 
@@ -77,6 +79,7 @@ Ferramentas:
 - `visual.chart`: `{tool,title,points:[{label,value}]}`; 1–40 valores finitos. Retorna componente `chart` com os dados originais.
 - `image.inspect`: `{tool,base64}`; PNG pequeno, até 30 mil caracteres base64. Retorna metadados; não interpreta cena.
 - `web.search`: `{tool,query}`; apenas Wikipedia, exige `WEB_ENABLED=true`, rede autorizada e validação externa. Não verifica notícias.
+- `academic.search`: `{tool,query}`; metadados do Crossref, exige `WEB_ENABLED=true`; não verifica conteúdo ou revisão por pares.
 
 Em chamadas SSE, erros após o início do stream vêm no evento `error` dentro de uma resposta HTTP 200. O cliente deve interpretar o evento, não considerar o status inicial uma conclusão bem-sucedida.
 

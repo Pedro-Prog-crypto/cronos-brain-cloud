@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS device_presence (device_id TEXT PRIMARY KEY REFERENCES devices(id) ON DELETE CASCADE, last_seen_at INTEGER NOT NULL, client TEXT NOT NULL);

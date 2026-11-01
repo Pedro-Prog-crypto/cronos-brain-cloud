@@ -1,6 +1,10 @@
 import { pdfFixture } from "./fixtures.mjs";
 import { migrate } from "./migrate.mjs";
-import { readFileSync, mkdirSync } from "node:fs";
+import { readFileSync, mkdirSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
 import { Miniflare } from "miniflare";
@@ -51,6 +55,13 @@ try {
       .then((s) => s.includes("Nenhum modelo conectado")),
     true,
   );
+  await page.locator("#metrics .metric").first().click();
+  await page.locator("#memory").waitFor({ state: "visible" });
+  await page.locator("[data-tab=overview]").click();
+  await page.locator("#overview").waitFor({ state: "visible" });
+  assert.equal(await page.locator("#login").isVisible(), false);
+  await page.locator(".flow-step").nth(2).click();
+  await page.locator("#agents").waitFor({ state: "visible" });
   await page.locator("[data-tab=memory]").click();
   await page.waitForFunction(() => !document.querySelector("#memory").hasAttribute("aria-busy"));
   await page
@@ -72,7 +83,7 @@ try {
   await page.locator("#graph-canvas").hover();
   await page.mouse.wheel(0, -200);
   mkdirSync("docs/screenshots", { recursive: true });
-  await page.screenshot({ path: "docs/screenshots/graph.png", fullPage: true });
+  await page.screenshot({ path: "docs/screenshots/graph.png", fullPage: true, animations: "disabled" });
   await page.locator("[data-tab=tools]").click();
   await page
     .locator("#chart-form [name=points]")
@@ -140,6 +151,26 @@ try {
     () =>
       document.querySelector("#personality-form [name=detail]").value === "35",
   );
+  await db.prepare("DELETE FROM rate_limits").run();
+  await page.locator("[data-tab=events]").click();
+  await page.waitForFunction(() => !document.querySelector("#events").hasAttribute("aria-busy"));
+  await page.locator("#event-form [name=title]").fill("Rotina de validação");
+  await page.locator("#event-form [name=dueAt]").fill("2026-11-09T10:00");
+  await page.locator("#event-form [name=recurrenceDays]").selectOption("7");
+  await page.locator("#event-form button").click();
+  await page.getByText("Rotina registrada.", { exact: false }).waitFor();
+  assert.equal((await db.prepare("SELECT recurrence_days FROM events WHERE title=?").bind("Rotina de validação").first()).recurrence_days, 7);
+  await page.locator("[data-tab=research]").click();
+  for (const name of ["Artigos acadêmicos", "Fontes confiáveis", "Tendências", "Alertas", "Monitoramento"])
+    assert.equal(await page.locator(`[data-research-mode="${name}"]`).isEnabled(), true);
+  await page.locator('[data-research-mode="Artigos acadêmicos"]').click();
+  await page.locator("#research-scope").filter({ hasText: "Crossref" }).waitFor();
+  await page.locator('[data-research-mode="Alertas"]').click();
+  await page.locator('#research-controls input').fill('CRONOS');
+  await page.locator('#research-controls button').filter({ hasText: 'Adicionar alerta' }).click();
+  await page.locator('[data-research-mode="Monitoramento"]').click();
+  await page.locator('#research-controls').filter({ hasText: 'CRONOS' }).waitFor();
+  await page.locator('[data-research-mode="Pesquisa"]').click();
   // Capture every reference page, checking both desktop and narrow layouts.
   // Fixture limits are reset directly in this isolated test database between sweeps.
   await db.prepare("DELETE FROM rate_limits").run();
@@ -176,6 +207,7 @@ try {
     await page.screenshot({
       path: `docs/screenshots/${tab}.png`,
       fullPage: true,
+      animations: "disabled",
     });
   }
   await db.prepare("DELETE FROM rate_limits").run();
@@ -192,7 +224,7 @@ try {
       ),
       `Reference-width overflow: ${tab}`,
     );
-    await page.screenshot({ path: `docs/screenshots/reference-960-${tab}.png`, fullPage: true });
+    await page.screenshot({ path: `docs/screenshots/reference-960-${tab}.png`, fullPage: true, animations: "disabled" });
   }
   await db.prepare("DELETE FROM rate_limits").run();
   await page.locator("[data-tab=integration]").click();
@@ -204,6 +236,23 @@ try {
   await page.locator("[data-tab=integration]").click();
   await page.waitForFunction(() => !document.querySelector("#integration").hasAttribute("aria-busy"));
   assert.equal(await page.locator("#permissions-form [name=show_notification]").isChecked(), true);
+  const [createdResponse] = await Promise.all([
+    page.waitForResponse((r) => r.url().endsWith('/v1/devices') && r.request().method() === 'POST'),
+    page.locator('#connect-desktop').click(),
+  ]);
+  const paired = await createdResponse.json();
+  await page.locator('#download-desktop-config').waitFor();
+  const bridgeDir = mkdtempSync(join(tmpdir(), 'cronos-bridge-'));
+  try {
+    const file = join(bridgeDir, 'cronos-desktop.json');
+    writeFileSync(file, JSON.stringify({ baseUrl: origin, deviceId: paired.id, credential: paired.credential }), { mode: 0o600 });
+    const { stdout } = await promisify(execFile)(process.execPath, ['client/desktop-bridge.mjs', file, '--once'], { timeout: 15000 });
+    assert.match(stdout, /CRONOS conectado ao Brain Cloud/);
+  } finally {
+    rmSync(bridgeDir, { recursive: true, force: true });
+  }
+  await page.locator('#check-desktop').click();
+  await page.locator('#connection-status').filter({ hasText: 'Conectado:' }).waitFor();
   await page.setViewportSize({ width: 390, height: 844 });
   for (const tab of pages) {
     await page.locator(`[data-tab=${tab}]`).click();
@@ -226,6 +275,7 @@ try {
   await page.screenshot({
     path: "docs/screenshots/mobile.png",
     fullPage: true,
+    animations: "disabled",
   });
   await page.locator("#logout").click();
   await page.locator("#login-form").waitFor();

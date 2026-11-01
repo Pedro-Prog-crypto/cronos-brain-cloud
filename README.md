@@ -2,7 +2,7 @@
 
 Backend e painel privado independentes do Cronos Desktop. Identidade da IA: **CRONOS**. Código em `/workspace/cronos-brain-cloud`; o repositório `/workspace/Cronos` permanece separado. Especificação original: [ESPECIFICACAO.md](docs/ESPECIFICACAO.md).
 
-Versão **0.4.3**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, PDF, conectores de voz/imagens/vídeo, pesquisa, memória vetorial, backup verificável com restauração e orquestração de especialistas. **44 testes automatizados e teste de navegador passaram.**
+Versão **0.4.4**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, PDF, conectores de voz/imagens/vídeo, pesquisa, memória vetorial, backup verificável com restauração e orquestração de especialistas. **46 testes automatizados e teste de navegador passaram.**
 
 Nenhum modelo externo está conectado neste ambiente. O sistema devolve indisponibilidade explícita quando precisa de inferência. Os 40 especialistas possuem caminho de execução, mas isso não significa 40 IAs validadas com modelo real. Veja o [estado de cada fase](docs/STATUS.md), incluindo funcionalidades ainda pendentes de implementação ou validação externa.
 
@@ -57,6 +57,10 @@ Os testes de interface usam banco temporário isolado. Capturas de validação f
 - Conversas simples usam um especialista; complexas podem executar duas análises em paralelo, crítica e síntese. Cache privado curto e SSE de progresso/resultado.
 - Painel de diagnóstico, dispositivos, autonomia, dados, especialistas e ferramentas.
 
+## Conectar ao CRONOS Desktop
+
+Na página **Integração**, clique em **Preparar conexão**, baixe `cronos-desktop.json` e execute `node client/desktop-bridge.mjs cronos-desktop.json` na máquina do CRONOS. A ponte envia presença autenticada a cada 20 segundos; **Verificar conexão** mostra o estado real. `--once` testa uma conexão e sai. A credencial é exclusiva, só aparece no arquivo baixado e pode ser revogada na lista de dispositivos. Se o Brain estiver em outra máquina, a URL precisa ser acessível por HTTPS; `127.0.0.1` só funciona na própria máquina. O aplicativo CRONOS Desktop original ainda precisa incorporar `BrainClient.connect()` de `client/brain.ts` para usar chat e ferramentas dentro do aplicativo; a ponte confirma comunicação e presença, sem executar comandos do Desktop.
+
 ## Próxima configuração externa
 
 O ambiente não tem credenciais nem autorização de rede para Cloudflare ou provedores de IA. Todos começam desativados. Não há conta paga, faturamento ou publicação habilitados. O procedimento está em [PUBLICACAO.md](docs/PUBLICACAO.md): segredos apenas no armazenamento seguro, catálogo/plano atual verificado antes de escolher modelo e orçamento inicial zero.
@@ -79,12 +83,12 @@ npm run check
 npm run dev
 ```
 
-A versão 0.4.3 inclui migrações até 0006 (busca, vetores, ações autorizadas e verificações de conexão). Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).
+A versão 0.4.4 inclui migrações até 0007 (busca, vetores, ações autorizadas e verificações de conexão). Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).
 
 [Configurar mídia, pesquisa, vetores e notificações](docs/CAPACIDADES.md). Novos conectores permanecem desativados até a configuração e verificação do plano gratuito. O painel permite enviar arquivos explicitamente; vídeo envia somente quadros selecionados localmente.
 
 ## Interface
 
-A versão 0.4.3 reúne as 12 telas do painel enviado pelo usuário, com tema espacial azul/violeta, atlas interativo, estúdio e preferências de personalidade persistentes. Consulte [INTERFACE.md](docs/INTERFACE.md) e as [capturas das telas](docs/screenshots/).
+A versão 0.4.4 reúne as 12 telas do painel enviado pelo usuário, com tema espacial azul/violeta, atlas interativo, estúdio e preferências de personalidade persistentes. Consulte [INTERFACE.md](docs/INTERFACE.md) e as [capturas das telas](docs/screenshots/).
 
 Se o iniciador antigo parou em `C:\Program Files\nodejs\node.exe scripts/device-create.mjs`, atualize `scripts/start-local.mjs` pelo ZIP mais recente. Preserve a pasta `.wrangler` da instalação existente, que contém os dados e a credencial local.

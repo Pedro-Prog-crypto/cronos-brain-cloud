@@ -1,5 +1,13 @@
 # Histórico de mudanças
 
+## 0.4.4 — 1 de novembro de 2026
+
+- Remove a numeração decorativa das telas e adiciona transições, resposta de clique e navegação por fluxo, métricas e diagrama.
+- Ativa recorrência no formulário; pesquisa acadêmica Crossref e ferramentas locais de filtro, tendências da sessão, alertas e verificação manual.
+- Ponte independente de presença e `BrainClient.connect()` para o CRONOS Desktop, com credencial própria, download de configuração, heartbeat e estado real no painel. O aplicativo Desktop original segue separado.
+- 46 testes locais aprovados e 12 páginas verificadas no navegador.
+
+
 ## 0.4.3 — 1 de novembro de 2026
 
 - Corrige o iniciador no Windows quando `node.exe` fica em um caminho com espaços, como `C:\Program Files\nodejs`.

@@ -6,6 +6,7 @@ import {hash} from '../auth/auth';
 export const researchInput=z.discriminatedUnion('tool',[
  z.object({tool:z.literal('news.search'),query:z.string().min(2).max(200)}).strict(),
  z.object({tool:z.literal('images.search'),query:z.string().min(2).max(200)}).strict(),
+ z.object({tool:z.literal('academic.search'),query:z.string().min(2).max(200)}).strict(),
 ]);
 const https=z.url().refine(v=>new URL(v).protocol==='https:'&&!new URL(v).username&&!new URL(v).password);
 const feedsSchema=z.array(z.object({url:https,articleHosts:z.array(z.string().regex(/^[a-z0-9.-]+$/)).min(1).max(10)}).strict()).min(1).max(3);
@@ -36,6 +37,22 @@ export async function executeResearch(env:Env,p:Principal,input:z.infer<typeof r
   const terms=input.query.toLocaleLowerCase().split(/\s+/).filter(Boolean);
   const sources=responses.flatMap(r=>r.status==='fulfilled'?r.value:[]).filter(r=>terms.some(t=>(r.title+' '+r.excerpt).toLowerCase().includes(t)));
   result={type:'sources',kind:'news',sources:[...new Map(sources.map(s=>[s.url,s])).values()].sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)).slice(0,10),failedSources:responses.filter(r=>r.status==='rejected').length,claimsVerified:false};
+ }else if(input.tool==='academic.search'){
+  const url=new URL('https://api.crossref.org/works');
+  url.search=new URLSearchParams({'query.bibliographic':input.query,rows:'8',select:'DOI,title,author,published,URL,type,container-title'}).toString();
+  const r=await fetch(url,{redirect:'manual',signal:AbortSignal.timeout(8000),headers:{'User-Agent':'CRONOS Brain Cloud (research client)'}});
+  if(!r.ok)throw new ApiError(503,'academic_search_unavailable');
+  const data=JSON.parse(new TextDecoder().decode(await limitedBytes(r,1_000_000)));
+  if(!Array.isArray(data.message?.items))throw new ApiError(502,'invalid_research_response');
+  const sources=data.message.items.flatMap((work:any)=>{
+   const doi=typeof work.DOI==='string'?work.DOI:'';
+   if(!/^10\.\d{4,9}\/.+/.test(doi))return [];
+   const title=clean(work.title?.[0]);if(!title)return [];
+   const date=work.published?.['date-parts']?.[0];
+   const publishedAt=Array.isArray(date)&&Number.isInteger(date[0])?String(date[0]):undefined;
+   return [{title,doi,url:`https://doi.org/${encodeURIComponent(doi)}`,excerpt:clean(work['container-title']?.[0]),author:(work.author??[]).slice(0,4).map((a:any)=>clean(`${a.given??''} ${a.family??''}`)).join(', '),publishedAt,retrievedAt:new Date().toISOString(),verification:'metadata-from-Crossref; article-not-independently-reviewed'}];
+  });
+  result={type:'academic-sources',kind:'academic',sources,claimsVerified:false};
  }else{
   const url=new URL('https://commons.wikimedia.org/w/api.php');url.search=new URLSearchParams({action:'query',format:'json',generator:'search',gsrsearch:input.query,gsrnamespace:'6',gsrlimit:'6',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'640'}).toString();
   const r=await fetch(url,{redirect:'manual',signal:AbortSignal.timeout(8000)});if(!r.ok)throw new ApiError(503,'image_search_unavailable');

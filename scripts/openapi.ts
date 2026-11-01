@@ -16,6 +16,7 @@ const schemas:Record<string,z.ZodType>={
   EventUpdate:z.object({status:z.enum(['active','completed','cancelled']).optional(),dueAt:z.iso.datetime({offset:true}).optional(),title:label.optional(),recurrenceDays:z.number().int().min(0).max(366).optional(),notify:z.boolean().optional()}).strict(),
   EventPlan:z.object({title:label,expression:z.string().min(1).max(300),notify:z.boolean().default(false)}).strict(),
   Time:z.object({expression:z.string().min(1).max(300)}).strict(),Device:z.object({name:label,role:z.enum(['reader','owner'])}).strict(),
+  DeviceHeartbeat:z.object({client:z.string().trim().min(1).max(80)}).strict(),
   Restore:z.object({confirm:z.literal('RESTORE INTO EMPTY ACCOUNT'),backup:envelopeSchema}).strict(),
   Delete:z.object({confirm:z.literal('DELETE MY DATA')}).strict(),AgentInput:z.object({message:text,toolInput:toolInput.optional(),memory:memorySchema.optional(),command:commandSchema.optional()}).strict(),Command:commandSchema,Permissions:z.object({actions:z.array(deviceAction).max(3)}).strict(),CommandResult:z.object({status:z.enum(['succeeded','failed']),result:z.string().max(2000)}).strict(),Subscription:z.object({url:z.url(),enabled:z.boolean()}).strict(),ProviderProbe:z.object({id:z.string().min(1).max(40)}).strict(),
   Error:z.object({error:z.object({code:z.string(),requestId:uuid})}),
@@ -31,7 +32,7 @@ const routes:[string,string,string?,number?][]=[
  ['get','/v1/events'],['post','/v1/events','Event',201],['get','/v1/events/{id}'],['patch','/v1/events/{id}','EventUpdate'],['post','/v1/events/plan','EventPlan',201],['post','/v1/time/resolve','Time'],
  ['get','/v1/reminders'],['post','/v1/reminders/{id}/ack'],['post','/v1/scheduler/run'],['get','/v1/agents'],['post','/v1/agents/{id}/run','AgentInput'],['get','/v1/providers/status'],
  ['get','/v1/tools'],['post','/v1/tools/execute','ToolInput'],['get','/v1/documents'],['delete','/v1/documents/{id}'],
- ['get','/v1/devices'],['post','/v1/devices','Device',201],['delete','/v1/devices/{id}'],['get','/v1/settings'],['put','/v1/settings','Settings'],['get','/v1/diagnostics'],
+ ['get','/v1/devices'],['post','/v1/devices','Device',201],['delete','/v1/devices/{id}'],['post','/v1/devices/heartbeat','DeviceHeartbeat'],['get','/v1/devices/connections'],['get','/v1/settings'],['put','/v1/settings','Settings'],['get','/v1/diagnostics'],
  ['get','/v1/data/export'],['delete','/v1/data','Delete'],['get','/v1/backup/export'],['post','/v1/backup/restore','Restore'],
 ];
 const paths:Record<string,Record<string,unknown>>={};
@@ -45,6 +46,6 @@ for(const [method,path,schema,status=200] of routes){
  if(path==='/v1/chat')operation.description='Accept: text/event-stream ativa eventos progress, result e error. A inferência atual é bufferizada: não transmite tokens individualmente.';
  (paths[path]??={})[method]=operation;
 }
-const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.4.1',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
+const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.4.4',description:'API privada. Escritas exigem owner, exceto logout e heartbeat do próprio dispositivo. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
 writeFileSync('docs/openapi.json',JSON.stringify(document,null,2)+'\n');
 console.log(`${routes.length} operações documentadas em OpenAPI 3.1.`);

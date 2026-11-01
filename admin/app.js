@@ -24,6 +24,9 @@ function notice(message, error = false) {
   $("#notice").textContent = message;
   $("#notice").className = error ? "error" : "";
   $("#notice").hidden = false;
+  $("#notice").classList.remove("notice-enter");
+  void $("#notice").offsetWidth;
+  $("#notice").classList.add("notice-enter");
   clearTimeout(notice.timer);
   notice.timer = setTimeout(() => ($("#notice").hidden = true), 9000);
 }
@@ -224,13 +227,17 @@ $("#event-form").addEventListener(
   "submit",
   safe(async () => {
     const d = formData("#event-form");
-    await api("/v1/events", "POST", {
+    const created = await api("/v1/events", "POST", {
       title: d.title,
       dueAt: new Date(d.dueAt).toISOString(),
       notify: d.notify === "on",
     });
+    if (Number(d.recurrenceDays) > 0)
+      await api(`/v1/events/${created.id}`, "PATCH", {
+        recurrenceDays: Number(d.recurrenceDays),
+      });
     await events();
-    notice("Compromisso registrado.");
+    notice(Number(d.recurrenceDays) > 0 ? "Rotina registrada. A próxima ocorrência será criada após a conclusão." : "Compromisso registrado.");
   }),
 );
 $("#plan-form").addEventListener(
@@ -594,6 +601,9 @@ let currentPage = "overview",
   memoryFilter = "",
   researchMode = "web.search",
   researchResults = null,
+  researchView = "Pesquisa",
+  researchWatches = [],
+  researchHistory = [],
   lastTool = null,
   lastResponse = null,
   atlasKind = "",
@@ -667,6 +677,7 @@ function table(parent, heads, rows) {
 }
 async function navigate(id) {
   if (!$("#" + id + ".tab")) return;
+  const previous = currentPage;
   currentPage = id;
   $$(".tab").forEach((t) => (t.hidden = t.id !== id));
   $$("nav button").forEach((b) => {
@@ -676,6 +687,11 @@ async function navigate(id) {
     else b.removeAttribute("aria-current");
   });
   const target = $("#" + id);
+  if (previous !== id) {
+    target.classList.remove("page-enter");
+    void target.offsetWidth;
+    target.classList.add("page-enter");
+  }
   // Repeated navigation must not remember the temporary disabled state as permanent.
   if (target.getAttribute("aria-busy") === "true") return;
   target.setAttribute("aria-busy", "true");
@@ -687,12 +703,33 @@ async function navigate(id) {
     target.removeAttribute("aria-busy");
   }
 }
-$$("[data-go]").forEach((b) =>
-  b.addEventListener(
-    "click",
-    safe(() => navigate(b.dataset.go)),
-  ),
-);
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-go]");
+  if (target) safe(() => navigate(target.dataset.go))(event);
+});
+document.addEventListener("keydown", (event) => {
+  const target = event.target.closest('[data-go][role="button"]');
+  if (target && ["Enter", " "].includes(event.key)) {
+    event.preventDefault();
+    target.click();
+  }
+});
+$(".brand").addEventListener("click", (event) => {
+  if (!session) return;
+  event.preventDefault();
+  safe(() => navigate("overview"))(event);
+});
+document.addEventListener("pointerdown", (event) => {
+  const control = event.target.closest("button, .source-card a");
+  if (!control || control.disabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const circle = document.createElement("span");
+  const box = control.getBoundingClientRect();
+  circle.className = "click-ripple";
+  circle.style.left = `${event.clientX - box.left}px`;
+  circle.style.top = `${event.clientY - box.top}px`;
+  control.append(circle);
+  circle.addEventListener("animationend", () => circle.remove(), { once: true });
+});
 async function overview() {
   const [d, p, t, e] = await Promise.all([
     api("/v1/diagnostics"),
@@ -710,6 +747,9 @@ async function overview() {
     ["events", "Compromissos", "clock"],
   ]) {
     const n = el("div", undefined, "metric");
+    n.dataset.go = key === "events" ? "events" : key === "memories" ? "memory" : "graph";
+    n.setAttribute("role", "button");
+    n.tabIndex = 0;
     n.append(svg(ico), el("strong", d.counts[key] ?? 0), el("span", label));
     metrics.append(n);
   }
@@ -1702,9 +1742,7 @@ $$("[data-time-view]").forEach((b) =>
     }[b.dataset.timeView];
     $(target).scrollIntoView({ behavior: "smooth", block: "center" });
     if (b.dataset.timeView === "Rotinas")
-      notice(
-        "Cadastre o compromisso. A configuração de recorrência está disponível pela API.",
-      );
+      notice("Defina a repetição no novo compromisso. A próxima ocorrência é criada após concluir a atual.");
   }),
 );
 async function loadResearch() {
@@ -1724,31 +1762,116 @@ async function loadResearch() {
       ? "Feeds RSS/Atom autorizados"
       : researchMode === "images.search"
         ? "Wikimedia Commons · autoria e licença"
+        : researchMode === "academic.search"
+          ? "Crossref · metadados de publicações com DOI"
         : "Wikipédia em português",
   );
+  renderResearchControls();
 }
 $$("[data-research-mode]").forEach((b) =>
   b.addEventListener(
     "click",
     safe(async () => {
-      researchMode = {
+      researchView = b.dataset.researchMode;
+      const nextMode = {
         Pesquisa: "web.search",
         Notícias: "news.search",
         Imagens: "images.search",
-      }[b.dataset.researchMode];
+        "Artigos acadêmicos": "academic.search",
+      }[researchView];
+      if (nextMode && nextMode !== researchMode) {
+        researchMode = nextMode;
+        researchResults = null;
+        renderResearch();
+      }
       $$("[data-research-mode]").forEach((x) =>
         x.classList.toggle("active", x === b),
       );
       $("#research-scope").textContent =
-        researchMode === "news.search"
+        researchView === "Fontes confiáveis"
+          ? "Exibe fontes com HTTPS, URL de origem e metadados. Procedência não comprova a veracidade das afirmações."
+          : researchView === "Tendências"
+            ? "Assuntos frequentes nos resultados desta sessão; não representa tendência global."
+            : researchView === "Alertas"
+              ? "Guarde termos nesta sessão para verificar correspondências manualmente."
+              : researchView === "Monitoramento"
+                ? "Verifique agora os termos salvos. Esta página não executa tarefas em segundo plano."
+                : researchMode === "news.search"
           ? "Notícias dos últimos 30 dias em feeds configurados, com datas e fontes."
           : researchMode === "images.search"
             ? "Imagens com créditos e licença, pesquisadas no Wikimedia Commons."
+            : researchMode === "academic.search"
+              ? "Publicações com DOI e metadados fornecidos pelo Crossref; leia a fonte para avaliar o estudo."
             : "Pesquisa em fonte enciclopédica autorizada, com links de origem.";
       await loadResearch();
+      if (["Fontes confiáveis", "Tendências"].includes(researchView)) renderResearch();
     }),
   ),
 );
+function renderResearchControls() {
+  const root = clear("#research-controls");
+  if (researchView === "Tendências") {
+    const words = researchHistory.flatMap((entry) => entry.sources.flatMap((source) =>
+      (source.title || "").toLocaleLowerCase("pt-BR").match(/[\p{L}]{5,}/gu) || [],
+    ));
+    const counts = new Map();
+    words.filter((w) => !["sobre", "entre", "artigo", "estudo", "dados", "brasil"].includes(w))
+      .forEach((w) => counts.set(w, (counts.get(w) || 0) + 1));
+    item(root, "Assuntos nesta sessão", researchHistory.length
+      ? "Frequência em títulos das últimas pesquisas realizadas aqui."
+      : "Faça uma pesquisa para ver os assuntos encontrados.");
+    const tags = el("div", undefined, "tag-list");
+    [...counts].sort((a, b) => b[1] - a[1]).slice(0, 8)
+      .forEach(([term, count]) => button(tags, `${term} (${count})`, () => {
+        $("#research-form").elements.query.value = term;
+        $("#research-form").requestSubmit();
+      }));
+    root.append(tags);
+  }
+  if (["Alertas", "Monitoramento"].includes(researchView)) {
+    item(root, "Termos acompanhados nesta sessão", researchWatches.length
+      ? researchWatches.join(" · ")
+      : "Nenhum termo salvo. Eles são apagados ao sair da sessão.");
+    if (researchView === "Alertas") {
+      const form = el("form");
+      form.className = "search-row";
+      const input = el("input");
+      input.placeholder = "Termo para acompanhar";
+      input.setAttribute("aria-label", "Termo para acompanhar");
+      input.required = true;
+      input.maxLength = 100;
+      const save = el("button", "Adicionar alerta");
+      form.append(input, save);
+      form.addEventListener("submit", safe(() => {
+        const term = input.value.trim();
+        if (term.length < 2) throw Error("Use pelo menos duas letras.");
+        if (researchWatches.length >= 5) throw Error("Até cinco termos por sessão.");
+        if (!researchWatches.some((w) => w.toLocaleLowerCase() === term.toLocaleLowerCase())) researchWatches.push(term);
+        renderResearchControls();
+        notice("Alerta local salvo. Abra Monitoramento para verificar agora.");
+      }));
+      root.append(form);
+    }
+    const tags = el("div", undefined, "tag-list");
+    researchWatches.forEach((term) => button(tags, `Remover ${term} ×`, () => {
+      researchWatches = researchWatches.filter((w) => w !== term);
+      renderResearchControls();
+    }));
+    root.append(tags);
+    if (researchView === "Monitoramento") button(root, "Verificar agora", async () => {
+      if (!researchWatches.length) throw Error("Adicione termos na aba Alertas primeiro.");
+      const results = await Promise.allSettled(researchWatches.map((query) =>
+        api("/v1/tools/execute", "POST", { tool: researchMode, query }),
+      ));
+      const report = clear("#research-results");
+      results.forEach((result, index) => item(report, researchWatches[index], result.status === "fulfilled"
+        ? `${result.value.result?.sources?.length || 0} fonte(s) encontradas agora.`
+        : `Falhou: ${result.reason.message}`));
+      notice("Verificação manual concluída.");
+    });
+  }
+  if (researchView === "Fontes confiáveis") item(root, "Critério visível", "HTTPS, link de origem e data ou autoria. A veracidade exige conferência humana.");
+}
 $("#research-form").addEventListener(
   "submit",
   safe(async () => {
@@ -1757,12 +1880,21 @@ $("#research-form").addEventListener(
       query: formData("#research-form").query,
     });
     researchResults = r.result;
+    researchHistory.unshift({query: formData("#research-form").query, sources: researchResults.sources || []});
+    researchHistory.length = Math.min(researchHistory.length, 5);
     renderResearch();
+    renderResearchControls();
   }),
 );
 function renderResearch() {
   const root = clear("#research-results");
-  const sources = researchResults?.sources || [];
+  const allSources = researchResults?.sources || [];
+  const sources = researchView === "Fontes confiáveis"
+    ? allSources.filter((source) => {
+      const url = source.sourceUrl || source.url;
+      return safeHref(url) && new URL(url).protocol === "https:" && Boolean(source.publishedAt || source.sourceUpdatedAt || source.author);
+    })
+    : allSources;
   if (!sources.length)
     emptyState(
       root,
@@ -1797,7 +1929,7 @@ function renderResearch() {
   const summary = clear("#research-summary");
   item(
     summary,
-    `${sources.length} fontes recuperadas`,
+    `${sources.length} fontes exibidas${sources.length !== allSources.length ? ` de ${allSources.length} recuperadas` : ""}`,
     "Gere um resumo para sintetizar estas fontes com um modelo conectado.",
   );
 }
@@ -2119,7 +2251,40 @@ $("#style-test-form").addEventListener(
 async function loadIntegration() {
   await settings();
   renderStructured();
+  await checkDesktopConnection();
 }
+let desktopPairing = null;
+async function checkDesktopConnection() {
+  const state = $("#connection-status");
+  const response = await api("/v1/devices/connections");
+  const desktop = response.devices.filter((d) => /CRONOS Desktop/i.test(d.name) && !d.revoked_at);
+  const online = desktop.find((d) => d.online);
+  state.textContent = online
+    ? `Conectado: ${online.name} · ${online.client} · última presença ${new Date(online.last_seen_at).toLocaleTimeString("pt-BR")}`
+    : desktop.length
+      ? "Ponte desconectada. Inicie a ponte no computador e verifique novamente."
+      : "Nenhuma ponte do CRONOS Desktop cadastrada.";
+  state.classList.toggle("connected", Boolean(online));
+}
+$("#connect-desktop").addEventListener("click", safe(async () => {
+  const device = await api("/v1/devices", "POST", { name: "CRONOS Desktop", role: "reader" });
+  desktopPairing = { baseUrl: location.origin, deviceId: device.id, credential: device.credential };
+  $("#desktop-pairing").hidden = false;
+  $("#desktop-pairing").textContent = `Dispositivo ${device.id} preparado. Baixe a configuração e inicie a ponte local. A credencial aparece apenas no arquivo baixado.`;
+  $("#download-desktop-config").hidden = false;
+  await settings();
+  await checkDesktopConnection();
+  notice("Credencial preparada. Baixe o arquivo agora; ela não poderá ser recuperada depois.");
+}));
+$("#download-desktop-config").addEventListener("click", safe(() => {
+  if (!desktopPairing) throw Error("Prepare a conexão primeiro.");
+  download("cronos-desktop.json", JSON.stringify(desktopPairing, null, 2));
+}));
+$("#check-desktop").addEventListener("click", safe(checkDesktopConnection));
+setInterval(() => {
+  if (session && currentPage === "integration" && !document.hidden)
+    checkDesktopConnection().catch((error) => { $("#connection-status").textContent = error.message; });
+}, 15000);
 $("#permissions-form").addEventListener(
   "submit",
   safe(async () => {
@@ -2180,6 +2345,15 @@ function logout() {
   editingMemory = null;
   memoryFilter = "";
   researchResults = null;
+  researchWatches = [];
+  researchHistory = [];
+  researchView = "Pesquisa";
+  desktopPairing = null;
+  $("#download-desktop-config").hidden = true;
+  $("#desktop-pairing").hidden = true;
+  $("#desktop-pairing").textContent = "";
+  $("#connection-status").textContent = "Aguardando verificação.";
+  $$("[data-research-mode]").forEach((b) => b.classList.toggle("active", b.dataset.researchMode === "Pesquisa"));
   lastTool = null;
   lastResponse = null;
   atlasMemories = [];
