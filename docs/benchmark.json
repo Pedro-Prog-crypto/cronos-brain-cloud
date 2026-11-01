@@ -1,0 +1,10 @@
+{
+  "environment": "Miniflare local; não representa latência de produção ou IA",
+  "datasetMemories": 500,
+  "queries": 30,
+  "resultLimit": 30,
+  "p50Ms": 4.25,
+  "p95Ms": 9.68,
+  "maxMs": 9.77,
+  "measuredAt": "2026-11-01T02:53:52.296Z"
+}
