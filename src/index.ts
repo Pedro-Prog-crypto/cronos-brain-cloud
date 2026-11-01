@@ -1,3 +1,4 @@
+import { deliverNotifications } from './capabilities/actions';
 import { z } from 'zod';
 import type { Env } from './types';
 import { ApiError } from './types';
@@ -139,5 +140,5 @@ export default {
       return response;
     }
   },
-  async scheduled(_controller: ScheduledController,env: Env) { await schedule(env.DB); await automatedBackups(env); },
+  async scheduled(_controller: ScheduledController,env: Env) { await schedule(env.DB); await automatedBackups(env); await deliverNotifications(env); },
 };

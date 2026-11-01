@@ -1,8 +1,12 @@
+import { mediaInput,executeMedia } from '../capabilities/media';
+import { researchInput,executeResearch } from '../capabilities/research';
+import { vectorInput,executeVector } from '../capabilities/vector';
 import { z } from 'zod';
 import { ApiError, type Env, type Principal } from '../types';
 import { ModelGateway } from '../providers/gateway';
 const point=z.object({label:z.string().min(1).max(80),value:z.number().finite().min(-1e9).max(1e9)}).strict();
 export const toolInput=z.discriminatedUnion('tool',[
+ ...mediaInput.options,...researchInput.options,...vectorInput.options,
   z.object({tool:z.literal('document.analyze'),name:z.string().min(1).max(120),text:z.string().min(1).max(24000),summarize:z.boolean().default(false)}).strict(),
   z.object({tool:z.literal('visual.chart'),title:z.string().min(1).max(120),points:z.array(point).min(1).max(40)}).strict(),
   z.object({tool:z.literal('web.search'),query:z.string().min(2).max(200)}).strict(),
@@ -10,6 +14,7 @@ export const toolInput=z.discriminatedUnion('tool',[
 ]);
 export type ToolInput=z.infer<typeof toolInput>;
 export const toolCatalog=[
+ ...[...mediaInput.options,...researchInput.options,...vectorInput.options].map(schema=>({id:schema.shape.tool.value,capability:schema.shape.tool.value,implementation:'implementado; validação externa pendente quando aplicável',external:schema.shape.tool.value!=='document.pdf'})),
   {id:'document.analyze',capability:'text-document',implementation:'implementado',external:false},
   {id:'visual.chart',capability:'visual',implementation:'implementado',external:false},
   {id:'image.inspect',capability:'png-metadata',implementation:'implementado',external:false},
@@ -18,6 +23,9 @@ export const toolCatalog=[
 export async function executeTool(env:Env,p:Principal,input:ToolInput) {
   const started=Date.now(); let status='succeeded',code:string|null=null;
   try {
+    const media=mediaInput.safeParse(input);if(media.success)return await executeMedia(env,p,media.data);
+    const research=researchInput.safeParse(input);if(research.success)return await executeResearch(env,p,research.data);
+    const vector=vectorInput.safeParse(input);if(vector.success)return await executeVector(env,p,vector.data);
     if(input.tool==='visual.chart') return {type:'chart',title:input.title,chartType:'bar',points:input.points,source:'user-provided-data'};
     if(input.tool==='image.inspect') {
       let bytes:Uint8Array; try { bytes=Uint8Array.from(atob(input.base64),c=>c.charCodeAt(0)); } catch { throw new ApiError(422,'invalid_image'); }
@@ -33,6 +41,7 @@ export async function executeTool(env:Env,p:Principal,input:ToolInput) {
       await env.DB.prepare('INSERT INTO documents VALUES (?,?,?,?,?,?)').bind(id,p.userId,input.name,'text/plain',input.text,new Date().toISOString()).run();
       return {type:'document',id,name:input.name,characters:input.text.length,words:input.text.trim().split(/\s+/u).length,lines:input.text.split('\n').length,summary,preview:input.text.slice(0,500)};
     }
+    if(input.tool!=='web.search')throw new ApiError(422,'unsupported_tool');
     if(env.WEB_ENABLED!=='true') throw new ApiError(503,'web_search_not_configured');
     // Fixed origin/path: arbitrary URLs from documents or users are never fetched.
     const url=new URL('https://pt.wikipedia.org/w/api.php');

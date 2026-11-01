@@ -1,10 +1,10 @@
 {
   "name": "cronos-brain-cloud",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "node scripts/embed-admin.mjs && wrangler dev --local --ip 127.0.0.1",
@@ -19,6 +19,8 @@
     "benchmark": "npm run build && node scripts/benchmark.mjs"
   },
   "dependencies": {
+    "fast-xml-parser": "5.11.2",
+    "unpdf": "2.1.0",
     "zod": "4.6.7"
   },
   "devDependencies": {

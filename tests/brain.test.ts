@@ -165,8 +165,8 @@ test('expiração, limite de autenticação e exclusão definitiva',async t=>{
 
 test('orquestração complexa executa análise, crítica e síntese com orçamento limitado',async t=>{
   const fetchMock=createFetchMock();fetchMock.disableNetConnect();
-  fetchMock.get('https://api.groq.com').intercept({path:'/openai/v1/chat/completions',method:'POST'}).reply(200,{choices:[{message:{content:'Análise de fixture para validação do fluxo'}}]}).times(4);
-  const providers=[{id:'groq',model:'fixture-only',enabled:true,freeTierVerified:true,verifiedAt:new Date().toISOString(),dailyRequestLimit:4,allowPersonalContext:true}];
+  fetchMock.get('https://api.groq.com').intercept({path:'/openai/v1/chat/completions',method:'POST'}).reply(200,{choices:[{message:{content:'Análise de fixture para validação do fluxo'}}]}).times(5);
+  const providers=[{id:'groq',model:'fixture-only',enabled:true,freeTierVerified:true,verifiedAt:new Date().toISOString(),dailyRequestLimit:5,allowPersonalContext:true}];
   const mf=new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'complex'},fetchMock,bindings:{PROVIDERS_JSON:JSON.stringify(providers),GROQ_API_KEY:'TEST-ONLY'}});
   t.after(()=>mf.dispose());const db=await setup(mf);const token=await login(mf);
   const result=await request(mf,'/v1/chat','POST',{message:'Compare dois caminhos para meu objetivo',complex:true},token);
@@ -174,5 +174,9 @@ test('orquestração complexa executa análise, crítica e síntese com orçamen
   const executions=(await db.prepare('SELECT agent_id,status FROM agent_executions ORDER BY agent_id').all()).results;
   assert.deepEqual(executions.map(e=>e.agent_id),['01','02','04','06']);assert.ok(executions.every(e=>e.status==='succeeded'));
   assert.equal((await db.prepare('SELECT requests FROM provider_usage').first() as any).requests,4);
+  await t.test('sondagem registra validação somente após resposta do provedor',async()=>{
+    assert.equal((await request(mf,'/v1/providers/probe','POST',{id:'groq'},token)).status,200);
+    assert.equal((await request(mf,'/v1/providers/status','GET',undefined,token)).data.providers[0].liveTested,true);
+  });
   fetchMock.assertNoPendingInterceptors();
 });

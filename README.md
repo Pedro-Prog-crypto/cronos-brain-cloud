@@ -2,13 +2,13 @@
 
 Backend e painel privado independentes do Cronos Desktop. Identidade da IA: **CRONOS**. Código em `/workspace/cronos-brain-cloud`; o repositório `/workspace/Cronos` permanece separado. Especificação original: [ESPECIFICACAO.md](docs/ESPECIFICACAO.md).
 
-Versão **0.2.1**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, ferramentas de documentos/gráficos/PNG, backup verificável com restauração e orquestração de especialistas. **34 testes automatizados e teste de navegador passaram.**
+Versão **0.3.0**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, PDF, conectores de voz/imagens/vídeo, pesquisa, memória vetorial, backup verificável com restauração e orquestração de especialistas. **43 testes automatizados e teste de navegador passaram.**
 
-Nenhum modelo externo está conectado neste ambiente. O sistema devolve indisponibilidade explícita quando precisa de inferência. O catálogo contém 40 funções; isso não significa 40 IAs operacionais. Veja o [estado de cada fase](docs/STATUS.md), incluindo funcionalidades ainda pendentes de implementação ou validação externa.
+Nenhum modelo externo está conectado neste ambiente. O sistema devolve indisponibilidade explícita quando precisa de inferência. Os 40 especialistas possuem caminho de execução, mas isso não significa 40 IAs validadas com modelo real. Veja o [estado de cada fase](docs/STATUS.md), incluindo funcionalidades ainda pendentes de implementação ou validação externa.
 
 ## Abrir localmente
 
-Requer Node.js 22+ e npm. Baixe e extraia o ZIP do repositório, ou clone-o com Git. Abra um terminal na pasta que contém `package.json`. Cada tarefa em nuvem já é isolada; use o checkout existente, sem criar worktrees.
+Requer Node.js 24+ e npm. Baixe e extraia o ZIP do repositório, ou clone-o com Git. Abra um terminal na pasta que contém `package.json`. Cada tarefa em nuvem já é isolada; use o checkout existente, sem criar worktrees.
 
 ```sh
 cd cronos-brain-cloud
@@ -69,4 +69,6 @@ npm run check
 npm run dev
 ```
 
-A versão 0.2.1 adiciona o índice de busca pela migração 0003, incluindo memórias já armazenadas. Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).
+A versão 0.3.0 inclui migrações até 0006 (busca, vetores, ações autorizadas e verificações de conexão). Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).
+
+[Configurar mídia, pesquisa, vetores e notificações](docs/CAPACIDADES.md). Novos conectores permanecem desativados até a configuração e verificação do plano gratuito. O painel permite enviar arquivos explicitamente; vídeo envia somente quadros selecionados localmente.

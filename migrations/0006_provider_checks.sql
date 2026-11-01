@@ -1,0 +1,1 @@
+CREATE TABLE provider_checks(user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,provider_id TEXT NOT NULL,config_hash TEXT NOT NULL,status TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(user_id,provider_id));

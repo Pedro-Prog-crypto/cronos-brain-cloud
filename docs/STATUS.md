@@ -1,28 +1,30 @@
-# Resultado por fase — versão 0.2.1
+# Resultado por fase — versão 0.3.0
 
-O desenvolvimento avançou pelas partes locais das dez fases. **A especificação completa ainda não está concluída.** As dependências externas estão desativadas; funções ausentes não foram apresentadas como operacionais. Nenhum arquivo do Cronos Desktop foi alterado.
+A versão 0.3.0 acrescenta os módulos que faltavam de mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
 
-| Fase | Implementado e verificado nesta entrega | Ainda necessário |
+| Fase | Implementado e verificado localmente | Limites e configuração pendente |
 |---|---|---|
-| 1 — Fundação | Worker/TypeScript, D1, schemas, sessões, funções, limites, revogação, painel privado | Conta e publicação Cloudflare; MFA/Access e proteção de borda |
-| 2 — Primeiro cérebro | Orquestração e histórico persistente; HTTP de modelo testado por interceptação | Conectar modelo real, validar respostas ao vivo, catálogo e cota gratuita |
-| 3 — Provedores | Quatro adaptadores; no máximo dois candidatos, timeout de 12 s, Retry-After persistente, teto diário, consentimento de contexto, cache privado | Validação real de cada provedor, seleção por qualidade/latência, contexto longo e capacidades multimodais; orçamento específico de tokens/neuron |
-| 4 — Memória | Cinco schemas, busca por termos, deduplicação, versões por trigger, edição otimista, propostas de revisão/consolidação via modelo, retenção opt-in de episódios, exportação e restauração transacional testada, backup R2 automático diário testado em emulador | Embeddings/busca vetorial, particionamento e migração entre motores, criptografia de aplicação, backups remotos reais e política de retenção desses backups |
-| 5 — Grafo | Criação automática a partir de temas/relações explícitos da memória, referências de origem, correção por API, visualização canvas real, zoom, arraste, busca e lista acessível | Extração semântica de entidades por modelo, expansão além dos limites de 500 nós/1000 arestas, agrupamento físico avançado |
-| 6 — Especialistas | 40 definições com instruções distintas, capacidades e condições de ativação; roteamento textual; execução direta de especialistas textuais e parte dos locais; análise paralela/crítica/síntese; histórico de execuções | Não há 40 especialistas plenamente operacionais: 9 capacidades externas permanecem planejadas; especialistas textuais aguardam inferência real; endpoints específicos atendem documentos, memória, grafo e composição visual |
-| 7 — Autonomia | Agenda, tarefas, metas, planejamento relativo, opt-in, silêncio por fuso, deduplicação, confirmação, recorrência ao concluir e sugestões na conversa; handler de agendamento | Cron Trigger publicado, notificações externas autorizadas, extração de compromissos do chat, semântica temporal abrangente e revisão automática de progresso |
-| 8 — Multimodal | Fluxo real de documento de texto → análise estrutural; dados → componente gráfico renderizado; PNG → dimensões; pesquisa Wikipedia implementada e desativada | Pesquisa validada na rede, notícias, PDFs, busca/criação de imagens, compreensão visual por IA, voz, áudio e vídeo; sem alegar análise semântica de PNG |
-| 9 — Integração | Cliente TypeScript e contrato OpenAPI versionado; corpo não precisa conhecer provedor | Conectar o Desktop permanece adiado conforme instrução expressa de manter separado |
-| 10 — Auditoria | TypeScript/build; 34 testes aprovados; teste real de navegador desktop/celular; recuperação, autorização e falhas verificadas | Auditoria independente, carga e segurança em produção, testes ao vivo de modelos e serviços externos |
+| 1 — Fundação | Workers, D1, autenticação, dispositivos, permissões, painel e OpenAPI | Cloudflare/Access/MFA e domínio de produção |
+| 2 — Primeiro cérebro | Conversa persistente, orquestração e sondagem de conexão que registra resultado real | Conectar e testar modelo real com plano gratuito confirmado |
+| 3 — Provedores | Adaptadores de texto, gateway multimodal, orçamento diário, fallback, timeout, Retry-After, cache privado | Validar compatibilidade de cada endpoint/modelo; seleção por histórico de qualidade/latência ainda não implementada |
+| 4 — Memória | Cinco tipos, FTS5, histórico, backup/restauração, embeddings e busca de cosseno persistida; chat combina vetorial/lexical quando disponível | Embeddings reais; Vectorize/particionamento ainda não implementados; vetores são reindexados após restaurar backup |
+| 5 — Grafo | Proveniência, geração a partir de temas declarados, correção por API, visualização interativa | Extração livre de entidades/relacionamentos por IA e layout avançado ainda não implementados |
+| 6 — Especialistas | Os 40 têm despacho para modelo, ferramentas, memória, agenda, política ou dispositivo; ferramentas permitidas verificadas | Qualidade e disponibilidade cognitiva exigem testes reais; catálogo mantém estado parcial, sem alegar 40 IAs operacionais |
+| 7 — Autonomia | Agenda, metas, silêncio, recorrência, opt-in, Cron declarado a cada 15 min, fila de webhook assinado com tentativas limitadas | Publicar Cron; configurar receptor autorizado; extração automática de compromissos em chat e replanejamento ainda pendentes |
+| 8 — Multimodal | PDF real; conectores de visão, geração, transcrição, voz, áudio por transcrição, vídeo por quadros; feeds RSS/Atom e Commons | Serviços externos não validados; sem OCR, captura contínua, análise acústica ou cobertura integral de vídeo; notícias preservam datas/fontes, mas não têm veracidade garantida |
+| 9 — Integração | Cliente de API e executor por callbacks com permissões, fila, expiração e resultados | Desktop continua separado por instrução do usuário; aplicativo receptor precisa instalar os callbacks |
+| 10 — Auditoria | 43 testes locais passando; navegador desktop/celular; PDF extraído; build de publicação em dry-run | Auditoria independente, carga e testes reais de inferência, pesquisa, entrega externa e recuperação remota |
 
-O painel oferece telas de visão geral, conversa, memórias, grafo, agenda/metas, ferramentas, especialistas e configurações. Não contém métricas ou respostas fictícias de provedores.
+## Validação
 
-## Evidências
+`npm run check`: TypeScript/build e 43 testes aprovados. Inferência, mídia remota e notificações são testadas com fixtures de transporte isoladas; extração de PDF, banco, indexação e cálculos são reais. Não existe provedor simulado no código de produção.
 
-`npm run check`: 34 testes passando, zero falhas. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: login, memória, grafo, composição de gráfico, 40 entradas do catálogo, responsividade e logout aprovados, sem exceções JavaScript. Migrações 0001, 0002 e 0003 aplicadas ao banco local. Detalhes em [AUDITORIA.md](AUDITORIA.md).
+`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 777 KiB comprimidos na versão validada. Não houve publicação. Migrações até 0006 aplicadas no banco local.
 
-## Dependências que impedem a validação final
+## Bloqueio externo atual
 
-O ambiente inspecionado não possui credenciais de Cloudflare, Groq ou OpenRouter. A rede é restrita e não autoriza seus endpoints nem Wikipedia. Não é possível verificar inferência real, condições comerciais atuais ou hospedagem permanente sem essas configurações. Nenhum modelo foi escolhido por suposição; nenhuma integração externa está marcada como validada. Veja [PUBLICACAO.md](PUBLICACAO.md).
+Não existem `CLOUDFLARE_API_TOKEN`, `GROQ_API_KEY`, `CAPABILITY_API_KEY` ou configuração de provedor neste ambiente. Foi salvo um rascunho com requisitos de Cloudflare/Groq e destinos `api.cloudflare.com`/`api.groq.com`. A revisão, preenchimento seguro, salvamento e publicação do ambiente ainda são necessários. Esse rascunho não criou contas, chaves ou serviços.
 
-Além das credenciais, os itens marcados acima como implementação pendente ainda exigem desenvolvimento. Configurar uma chave não conclui automaticamente a especificação inteira.
+As capacidades multimodais exigem um serviço compatível escolhido e verificado pelo operador. Gratuidade não foi presumida. Não é possível concluir a validação real de todas as funções somente acrescentando arquivos ao repositório.
+
+Configuração e limites: [CAPACIDADES.md](CAPACIDADES.md) e [PUBLICACAO.md](PUBLICACAO.md).

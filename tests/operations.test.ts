@@ -70,7 +70,7 @@ test('operações avançadas integradas no Worker/D1',async t=>{
   });
   await t.test('especialista local executa função e registra histórico',async()=>{
     const result=await req('/v1/agents/39/run','POST',{message:'Verificar permissões'});assert.equal(result.status,200);assert.equal(result.data.result.externalActionsAllowed,false);
-    assert.equal((await req('/v1/agents/13/run','POST',{message:'Veja a imagem'})).status,503);
+    assert.equal((await req('/v1/agents/13/run','POST',{message:'Veja a imagem'})).status,422);
     const cat=await req('/v1/agents');assert.equal(cat.data.agents.length,40);assert.ok(cat.data.executions.some((e:any)=>e.agent_id==='39'&&e.status==='succeeded'));
   });
   await t.test('SSE anuncia processamento e erro honesto quando não há modelo',async()=>{

@@ -1,8 +1,10 @@
+> Evolução v0.3.0: consulte CAPACIDADES.md para mídia, vetores e ações. As limitações de integrações descritas abaixo refletem a fundação v0.2.1 quando indicado.
+
 # Arquitetura
 
 ## Entrada e identidade
 
-Worker TypeScript recebe HTTPS, valida schemas/tamanho, autentica sessão opaca e extrai usuário/dispositivo/função do banco. IDs de usuário fornecidos pelo cliente nunca selecionam o proprietário dos dados. D1 contém dados estruturados; interfaces `MemoryStore` e `InferenceProvider` separam persistência e inferência de suas implementações. R2 é opcional para backups; nenhum Vectorize/embedding está habilitado.
+Worker TypeScript recebe HTTPS, valida schemas/tamanho, autentica sessão opaca e extrai usuário/dispositivo/função do banco. IDs de usuário fornecidos pelo cliente nunca selecionam o proprietário dos dados. D1 contém dados estruturados; interfaces `MemoryStore` e `InferenceProvider` separam persistência e inferência de suas implementações. R2 é opcional para backups; Vectorize permanece ausente; embeddings via provedor configurável ficam em tabela D1 e são opcionais.
 
 O painel é uma aplicação estática servida pelo mesmo Worker em `/admin`. O shell de login é público; todos os dados vêm da API autenticada. Tokens ficam apenas na memória da página. Não há chave de provedor no JavaScript. Conteúdo do usuário é renderizado com textContent; não se utiliza innerHTML para memória, documentos ou respostas.
 

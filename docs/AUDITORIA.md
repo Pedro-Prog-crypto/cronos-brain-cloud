@@ -1,11 +1,11 @@
-# Auditoria de desenvolvimento v0.2.1
+# Auditoria de desenvolvimento v0.3.0
 
 ## Resultado observado
 
 - `npm run typecheck`: aprovado.
-- `npm test`: 34 testes aprovados, zero falhas.
+- `npm test`: 43 testes aprovados, zero falhas.
 - `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: aprovado, sem exceções JavaScript; desktop 1440 px e celular 390 px.
-- Migrações 0001/0002/0003 aplicadas com sucesso no D1 local do Wrangler.
+- Migrações 0001 a 0006 aplicadas com sucesso no D1 local do Wrangler.
 - `git -C /workspace/Cronos status --porcelain`: vazio. O corpo não foi modificado.
 
 Os resultados de modelo nos testes são fixtures HTTP identificadas como tal. O sistema implantável não contém respostas de modelo simuladas. R2 nos testes é o emulador Miniflare, não armazenamento externo real. Capturas em `screenshots/` são artefatos de validação do painel com registros de teste isolados.
@@ -43,4 +43,8 @@ Inferência real, planos e limites gratuitos atuais, publicação HTTPS permanen
 
 A medição atual usa 500 memórias e 30 buscas autenticadas. Resultados em `benchmark.json`; reproduzir com `node scripts/benchmark.mjs` após build. Miniflare local não representa latência de produção ou de inferência.
 
-Regressões da v0.2.1: amanhã com acento, datas ambíguas, palavras sem acentos e prefixos, migração de dados existentes, manutenção do índice em edições/exclusões, isolamento da busca, cancelamento de lembretes e avanço sobre 205 eventos sem duplicação.
+Regressões mantidas desde a v0.2.1: amanhã com acento, datas ambíguas, palavras sem acentos e prefixos, migração de dados existentes, manutenção do índice em edições/exclusões, isolamento da busca, cancelamento de lembretes e avanço sobre 205 eventos sem duplicação.
+
+## Novas verificações da v0.3.0
+
+PDF gerado no teste foi extraído de verdade. Visão, transcrição, síntese, geração, embedding e webhook usam HTTP/funções simuladas identificadas. Foram verificados invalidação de vetor após edição, bloqueio de ação sem permissão, resultado por dispositivo, assinatura HMAC, cooldown 429, parser de feeds sem entidades, rejeição de datas/hosts inválidos e sondagem de provedor. O teste de PDF produziu aviso de fonte padrão sem impedir a extração; suporte amplo a fontes e OCR não foi validado. Nenhuma inferência externa real ou entrega a terceiros foi executada.

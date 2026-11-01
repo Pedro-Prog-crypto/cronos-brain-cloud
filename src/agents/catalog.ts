@@ -1,5 +1,5 @@
 import { definitions } from './definitions';
-const unavailable = new Set(['vision','news','image-search','image-generation','speech-to-text','text-to-speech','audio','video','device-command']);
+const external = new Set(['vision','news','image-search','image-generation','speech-to-text','text-to-speech','audio','video']);
 export function selectAgent(message: string): string {
   if (/erro|bug|stack|falha/i.test(message)) return '22';
   if (/código|program|typescript|python/i.test(message)) return '21';
@@ -17,10 +17,10 @@ export function selectAgents(message:string,complex=false):string[] {
 export function instruction(id:string) { return definitions.find(d=>d.id===id)?.instruction ?? definitions[0].instruction; }
 export function catalog() {
   return definitions.map(d=>({...d,description:d.instruction,
-    implementation:unavailable.has(d.capability)?'planejado':'parcialmente implementado',
-    availability:unavailable.has(d.capability)?'capacidade externa indisponível':d.capability.startsWith('local-')?'implementação local; consulte relatório de testes':'aguarda validação com modelo real',
+    implementation:'parcialmente implementado',
+    availability:external.has(d.capability)?'conector implementado; aguarda configuração e validação externa':d.capability.startsWith('local-')?'implementação local; consulte relatório de testes':'aguarda validação com modelo real',
     preferredModel:null,alternativeModels:[],
-    allowedTools:d.id==='12'?['document.analyze']:d.id==='16'?['visual.chart']:d.id==='07'?['web.search']:[],
+    allowedTools:({'07':['web.search'],'08':['news.search'],'12':['document.analyze','document.pdf'],'13':['vision.analyze'],'14':['images.search'],'15':['image.generate'],'16':['visual.chart'],'17':['speech.transcribe'],'18':['speech.synthesize'],'19':['audio.analyze'],'20':['video.analyze']} as Record<string,string[]>)[d.id]??[],
     input:d.capability==='text'?'pedido e contexto autorizado':'schema da capacidade',output:d.capability==='text'?'análise textual':'resultado estruturado',
     priority:d.id==='39'?100:10,lastLiveTest:null,estimatedCost:null,
   }));

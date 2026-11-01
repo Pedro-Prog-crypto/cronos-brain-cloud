@@ -15,7 +15,7 @@ Cada objeto de provedor exige `id` (`groq`, `openrouter`, `generic`, `cloudflare
 
 O gateway usa um teto conservador de solicitações e máximo de 1024 tokens de saída. Cotas de tokens/neuron e preços específicos ainda precisam de adaptadores por provedor. Por isso mantenha contas sem cobrança habilitada. Se não for possível garantir orçamento zero no serviço escolhido, mantenha-o desativado.
 
-Para agendamento futuro, após validar consentimento e limites, adicionar `triggers.crons` em Wrangler. O handler existe, mas nenhum Cron Trigger foi ativado. O código de backup R2 automático existe e foi testado no emulador. Para ativar, verificar disponibilidade sem cobrança, adicionar binding `BACKUPS`, definir `BACKUPS_ENABLED="true"` e obter opt-in no painel. Vectorize permanece pendente. Não presumir disponibilidade gratuita.
+Wrangler declara um Cron de 15 em 15 minutos. Ele só será ativado após publicação real; revise quotas e opt-ins antes do deploy. O código de backup R2 automático existe e foi testado no emulador. Para ativar, verificar disponibilidade sem cobrança, adicionar binding `BACKUPS`, definir `BACKUPS_ENABLED="true"` e obter opt-in no painel. Vectorize permanece pendente. Não presumir disponibilidade gratuita.
 
 Backup manual de desenvolvimento: `npx wrangler d1 export DB --local --output /caminho/seguro/brain.sql`. Restauração de dumps SQL exige banco de destino separado e migrações compatíveis. A restauração JSON pela API já foi validada localmente: use o backup v2 e uma conta vazia. Recuperação remota por dump SQL ainda não foi validada. Nunca guardar backups pessoais no repositório.
 
@@ -23,3 +23,5 @@ Backup manual de desenvolvimento: `npx wrangler d1 export DB --local --output /c
 Pesquisa opcional: o conector usa exclusivamente `pt.wikipedia.org`, com `WEB_ENABLED="true"`. Ele está desativado e a rede atual não permite esse domínio. Adicionar o domínio pelo fluxo de configuração e testar antes de ativar. Não habilita notícias, busca de imagens ou acesso arbitrário a URLs.
 
 O painel `/admin` é servido junto com o Worker; em produção, usar domínio HTTPS e preferencialmente proteção adicional Cloudflare Access. O shell de login é público, os recursos privados exigem sessão. Não expor `wrangler dev` na Internet: ele é um servidor de desenvolvimento e pode incluir ferramentas locais de inspeção.
+
+A v0.3.0 exige Node.js 24+ para a biblioteca de PDF. Execute `npm ci`, migrações e testes antes de publicar. O build foi validado com `wrangler deploy --dry-run`, que não publica serviços. Conectores adicionais: CAPACIDADES.md.

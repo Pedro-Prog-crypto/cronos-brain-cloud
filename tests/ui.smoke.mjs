@@ -1,3 +1,4 @@
+import {pdfFixture} from './fixtures.mjs';
 import { migrate } from './migrate.mjs';
 import {readFileSync,mkdirSync} from 'node:fs';
 import assert from 'node:assert/strict';
@@ -35,6 +36,10 @@ await page.screenshot({path:'docs/screenshots/graph.png',fullPage:true});
 await page.locator('[data-tab=tools]').click();
 await page.locator('#chart-form [name=points]').fill('[{"label":"Leitura","value":4},{"label":"Exercícios","value":7}]');
 await page.locator('#chart-form button').click();await page.locator('#tool-result .bar').first().waitFor();
+await page.locator('#media-form select').selectOption('document.pdf');
+await page.locator('#media-form input[type=file]').setInputFiles({name:'test.pdf',mimeType:'application/pdf',buffer:Buffer.from(pdfFixture(),'base64')});
+await page.locator('#media-form button').click();
+await page.locator('#tool-result pre').filter({hasText:'CRONOS PDF real'}).waitFor();
 await page.locator('[data-tab=agents]').click();await page.locator('#agent-list article').nth(39).waitFor();assert.equal(await page.locator('#agent-list article').count(),40);
 await page.locator('[data-tab=overview]').click();await page.locator('#metrics .metric').first().waitFor();
 await page.screenshot({path:'docs/screenshots/overview.png',fullPage:true});
@@ -42,5 +47,5 @@ await page.setViewportSize({width:390,height:844});
 assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
 await page.screenshot({path:'docs/screenshots/mobile.png',fullPage:true});
 await page.locator('#logout').click();await page.locator('#login-form').waitFor();
-assert.deepEqual(errors,[]);console.log('Browser checks passed: login, memory, graph, chart, 40 agents, responsive layout, logout; no JS exceptions.');
+assert.deepEqual(errors,[]);console.log('Browser checks passed: login, memory, graph, chart, PDF, 40 agents, responsive layout, logout; no JS exceptions.');
 }finally{await browser.close();await mf.dispose();}

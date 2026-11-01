@@ -1,0 +1,5 @@
+CREATE TABLE device_permissions(device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,action TEXT NOT NULL,PRIMARY KEY(device_id,action));
+CREATE TABLE device_commands(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,action TEXT NOT NULL,payload TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending',created_at TEXT NOT NULL,expires_at TEXT NOT NULL,result TEXT);
+CREATE INDEX commands_device ON device_commands(device_id,status,created_at);
+CREATE TABLE notification_subscriptions(user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,url TEXT NOT NULL,enabled INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE notification_deliveries(reminder_id TEXT PRIMARY KEY REFERENCES reminders(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,status TEXT NOT NULL DEFAULT 'pending',attempts INTEGER NOT NULL DEFAULT 0,next_attempt INTEGER NOT NULL DEFAULT 0,lease_until INTEGER NOT NULL DEFAULT 0,error_code TEXT);

@@ -38,9 +38,9 @@ Metadados das memórias:
 - procedural (`procedural`): `{steps:[...],execution:"manual"}`;
 - relacional (`relational`): `{from,to,relation}`.
 
-Busca de memória usa FTS5 com palavras/prefixos e ignora acentos. Múltiplas palavras na busca devem estar presentes; a recuperação automática no chat classifica correspondências por relevância. Pontuação não é interpretada como operador de busca. Consultas vazias listam registros recentes; consultas apenas com pontuação retornam lista vazia. A migração 0003 reconstrói o índice dos dados existentes e instala triggers para mantê-lo atualizado. Não existe busca semântica vetorial ainda. A deduplicação considera usuário, tipo, conteúdo normalizado e metadados, preservando a primeira origem.
+Busca de memória usa FTS5 com palavras/prefixos e ignora acentos. Múltiplas palavras na busca devem estar presentes; a recuperação automática no chat classifica correspondências por relevância. Pontuação não é interpretada como operador de busca. Consultas vazias listam registros recentes; consultas apenas com pontuação retornam lista vazia. A migração 0003 reconstrói o índice dos dados existentes e instala triggers para mantê-lo atualizado. Busca vetorial está disponível pelas ferramentas de embedding quando configuradas. A deduplicação considera usuário, tipo, conteúdo normalizado e metadados, preservando a primeira origem.
 
-O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente demonstrativo em `client/brain.ts` mantém integração futura separada do Desktop. As 50 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
+O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente demonstrativo em `client/brain.ts` mantém integração futura separada do Desktop. As 58 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
 
 
 ## Operações adicionadas na v0.2
@@ -79,3 +79,18 @@ Ferramentas:
 - `web.search`: `{tool,query}`; apenas Wikipedia, exige `WEB_ENABLED=true`, rede autorizada e validação externa. Não verifica notícias.
 
 Em chamadas SSE, erros após o início do stream vêm no evento `error` dentro de uma resposta HTTP 200. O cliente deve interpretar o evento, não considerar o status inicial uma conclusão bem-sucedida.
+
+
+## Contratos da v0.3.0
+
+Mídia, PDF, notícias, busca de imagens e embeddings usam `/v1/tools/execute`; entradas e limites detalhados em [CAPACIDADES.md](CAPACIDADES.md). O corpo de ferramentas/agentes aceita até 2 MB; demais operações mantêm 32 KiB.
+
+- `GET /v1/capabilities`: configuração e disponibilidade dos conectores, sem segredos.
+- `POST /v1/providers/probe`, `{id}`: uma inferência real no provedor escolhido; usa quota configurada. O status registra sucesso/falha e hash da configuração testada.
+- `PUT /v1/devices/{id}/permissions`, `{actions}`: permissões explícitas para dispositivo próprio.
+- `POST /v1/commands`, `{deviceId,action,payload,confirm:true}`: enfileira ação autorizada, sem alegar execução.
+- `GET /v1/commands`: fila do próprio dispositivo autenticado.
+- `POST /v1/commands/{id}/result`, `{status,result}`: dispositivo registra resultado, com rechecagem de permissão e expiração.
+- `GET/PUT /v1/notifications/subscription`: webhook do usuário; escrita `{url,enabled}` depende de allowlist e segredo HMAC no Worker.
+
+Agent run também aceita `toolInput`, `memory` ou `command` conforme o especialista. IDs 07–20 despacham somente ferramentas explicitamente permitidas. ID25 enfileira comando autorizado; ID33 grava memória validada; ID38 executa orquestração.
