@@ -1,5 +1,11 @@
 # Histórico de mudanças
 
+## 0.4.3 — 1 de novembro de 2026
+
+- Corrige o iniciador no Windows quando `node.exe` fica em um caminho com espaços, como `C:\Program Files\nodejs`.
+- As chamadas diretas ao Node/Wrangler não usam shell; npm continua por `cmd.exe` com comandos fixos.
+
+
 ## 0.4.2 — 1 de novembro de 2026
 
 - Iniciadores para Windows e macOS: instalam dependências, aplicam migrações locais, preparam o primeiro dispositivo e abrem o painel.

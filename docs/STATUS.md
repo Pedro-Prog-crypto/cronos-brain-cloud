@@ -1,6 +1,6 @@
-# Resultado por fase — versão 0.4.2
+# Resultado por fase — versão 0.4.3
 
-As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.2 melhora os controles de permissão e entrega de lembretes no painel. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
+As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.3 melhora os controles de permissão e entrega de lembretes no painel. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
 
 | Fase | Implementado e verificado localmente | Limites e configuração pendente |
 |---|---|---|

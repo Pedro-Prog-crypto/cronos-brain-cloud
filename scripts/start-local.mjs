@@ -7,9 +7,13 @@ import {join} from 'node:path';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const local=join(root,'.wrangler');
 const url='http://127.0.0.1:8787/admin';
-const npm=process.platform==='win32'?'npm.cmd':'npm';
-const options={cwd:root,stdio:'inherit',shell:process.platform==='win32'};
+// Direct executables and paths must never go through cmd.exe: Windows paths can contain spaces.
+const options={cwd:root,stdio:'inherit',shell:false};
 const run=(command,args,extra={})=>execFileSync(command,args,{...options,...extra});
+const npmCall=args=>process.platform==='win32'
+ ? ['cmd.exe',['/d','/s','/c',`npm.cmd ${args.join(' ')}`]]
+ : ['npm',args];
+const runNpm=(args,extra={})=>run(...npmCall(args),extra);
 
 if(Number(process.versions.node.split('.')[0])<24){
  console.error('Instale o Node.js 24 ou superior em https://nodejs.org/ e tente novamente.');
@@ -26,11 +30,11 @@ try{
  const stamp=join(local,'launcher-lock.txt');
  if(!existsSync(join(root,'node_modules','.package-lock.json'))||!existsSync(stamp)||readFileSync(stamp,'utf8')!==lockHash){
   console.log('Instalando dependências; a primeira abertura pode levar alguns minutos…');
-  run(npm,['ci']);
+  runNpm(['ci']);
   writeFileSync(stamp,lockHash,{mode:0o600});
  }
  console.log('Preparando o banco local…');
- run(npm,['run','db:migrate'],{env:{...process.env,CI:'true'}});
+ runNpm(['run','db:migrate'],{env:{...process.env,CI:'true'}});
  const credentials=join(local,'device.local.json');
  const sql=join(local,'device.local.sql');
  if(existsSync(credentials)!==existsSync(sql))throw Error('Os arquivos do dispositivo local estão incompletos. Guarde uma cópia de .wrangler antes de corrigir a instalação.');
@@ -41,12 +45,12 @@ try{
   const idempotent=readFileSync(sql,'utf8').replaceAll('INSERT INTO users','INSERT OR IGNORE INTO users').replaceAll('INSERT INTO devices','INSERT OR IGNORE INTO devices');
   const installSql=join(local,'device.install.sql');
   writeFileSync(installSql,idempotent,{mode:0o600});
-  try{run(process.execPath,[join(root,'node_modules','wrangler','bin','wrangler.js'),'d1','execute','DB','--local','--file',installSql],{shell:false});}
+  try{run(process.execPath,[join(root,'node_modules','wrangler','bin','wrangler.js'),'d1','execute','DB','--local','--file',installSql]);}
   finally{try{unlinkSync(installSql);}catch{}}
   writeFileSync(ready,'ready',{mode:0o600});
  }
  console.log('Iniciando o painel…');
- const server=spawn(npm,['run','dev'],options);
+ const server=spawn(...npmCall(['run','dev']),options);
  let exited=false;
  server.on('error',error=>{exited=true;console.error('Falha ao iniciar o servidor:',error.message);});
  server.on('exit',()=>{exited=true;});
