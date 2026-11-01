@@ -23,7 +23,7 @@ const schemas:Record<string,z.ZodType>={
 };
 const routes:[string,string,string?,number?][]=[
  ['get','/v1/personality'],['put','/v1/personality','Personality'],
- ['get','/v1/capabilities'],['post','/v1/providers/probe','ProviderProbe'],['put','/v1/devices/{id}/permissions','Permissions'],['get','/v1/commands'],['post','/v1/commands','Command',201],['post','/v1/commands/{id}/result','CommandResult'],['get','/v1/notifications/subscription'],['put','/v1/notifications/subscription','Subscription'],
+ ['get','/v1/capabilities'],['post','/v1/providers/probe','ProviderProbe'],['get','/v1/devices/{id}/permissions'],['put','/v1/devices/{id}/permissions','Permissions'],['get','/v1/commands'],['post','/v1/commands','Command',201],['post','/v1/commands/{id}/result','CommandResult'],['get','/v1/notifications/subscription'],['put','/v1/notifications/subscription','Subscription'],
  ['get','/v1/health'],['post','/v1/auth/sessions','SessionRequest',201],['post','/v1/auth/logout'],['post','/v1/chat','ChatRequest'],
  ['post','/v1/memory','Memory',201],['get','/v1/memory/search'],['put','/v1/memory/{id}','MemoryUpdate'],['delete','/v1/memory/{id}'],['get','/v1/memory/{id}/versions'],['post','/v1/memory/review','MemoryReview'],
  ['get','/v1/knowledge/graph'],['get','/v1/knowledge/graph/search'],['post','/v1/knowledge/nodes','Node',201],['post','/v1/knowledge/edges','Edge',201],['delete','/v1/knowledge/nodes/{id}'],['delete','/v1/knowledge/edges/{id}'],
@@ -45,6 +45,6 @@ for(const [method,path,schema,status=200] of routes){
  if(path==='/v1/chat')operation.description='Accept: text/event-stream ativa eventos progress, result e error. A inferência atual é bufferizada: não transmite tokens individualmente.';
  (paths[path]??={})[method]=operation;
 }
-const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.4.0',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
+const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.4.1',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
 writeFileSync('docs/openapi.json',JSON.stringify(document,null,2)+'\n');
 console.log(`${routes.length} operações documentadas em OpenAPI 3.1.`);

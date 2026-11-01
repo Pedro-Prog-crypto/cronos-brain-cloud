@@ -69,10 +69,10 @@ npm run check
 npm run dev
 ```
 
-A versão 0.4.0 inclui migrações até 0006 (busca, vetores, ações autorizadas e verificações de conexão). Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).
+A versão 0.4.1 inclui migrações até 0006 (busca, vetores, ações autorizadas e verificações de conexão). Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).
 
 [Configurar mídia, pesquisa, vetores e notificações](docs/CAPACIDADES.md). Novos conectores permanecem desativados até a configuração e verificação do plano gratuito. O painel permite enviar arquivos explicitamente; vídeo envia somente quadros selecionados localmente.
 
 ## Interface
 
-A versão 0.4.0 reúne as 12 telas do painel enviado pelo usuário, com tema espacial azul/violeta, atlas interativo, estúdio e preferências de personalidade persistentes. Consulte [INTERFACE.md](docs/INTERFACE.md) e as [capturas das telas](docs/screenshots/).
+A versão 0.4.1 reúne as 12 telas do painel enviado pelo usuário, com tema espacial azul/violeta, atlas interativo, estúdio e preferências de personalidade persistentes. Consulte [INTERFACE.md](docs/INTERFACE.md) e as [capturas das telas](docs/screenshots/).

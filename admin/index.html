@@ -981,6 +981,17 @@
                       <use href="#i-tools" /></svg
                     >Permissões de ferramentas
                   </button>
+                  <details class="notification-settings">
+                    <summary>Entrega de notificações</summary>
+                    <p id="notification-state" class="muted"></p>
+                    <form id="notification-form">
+                      <label>Endereço autorizado para receber lembretes
+                        <input name="url" type="url" required placeholder="https://exemplo.com/notificacoes" />
+                      </label>
+                      <label class="check"><input name="enabled" type="checkbox" /> Ativar entrega de lembretes autorizados</label>
+                      <button>Salvar entrega</button>
+                    </form>
+                  </details>
                 </article>
               </div>
               <article class="panel">

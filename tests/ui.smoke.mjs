@@ -52,6 +52,7 @@ try {
     true,
   );
   await page.locator("[data-tab=memory]").click();
+  await page.waitForFunction(() => !document.querySelector("#memory").hasAttribute("aria-busy"));
   await page
     .locator("#memory-form [name=content]")
     .fill("Registro de validação do painel CRONOS");
@@ -194,6 +195,15 @@ try {
     await page.screenshot({ path: `docs/screenshots/reference-960-${tab}.png`, fullPage: true });
   }
   await db.prepare("DELETE FROM rate_limits").run();
+  await page.locator("[data-tab=integration]").click();
+  await page.locator("#permission-state").filter({ hasText: "não tem ações" }).waitFor();
+  await page.locator("#permissions-form [name=show_notification]").check();
+  await page.locator("#permissions-form button").click();
+  await page.locator("#permission-state").filter({ hasText: "carregadas" }).waitFor();
+  await page.locator("[data-tab=settings]").click();
+  await page.locator("[data-tab=integration]").click();
+  await page.waitForFunction(() => !document.querySelector("#integration").hasAttribute("aria-busy"));
+  assert.equal(await page.locator("#permissions-form [name=show_notification]").isChecked(), true);
   await page.setViewportSize({ width: 390, height: 844 });
   for (const tab of pages) {
     await page.locator(`[data-tab=${tab}]`).click();

@@ -18,6 +18,12 @@ function webhookUrl(env:Env,value:string){
 }
 export async function actionRoutes(r:Request,env:Env,p:Principal){
  const path=new URL(r.url).pathname;
+ if(/^\/v1\/devices\/[^/]+\/permissions$/.test(path)&&r.method==='GET'){
+  const id=path.split('/')[3];
+  if(!await env.DB.prepare('SELECT id FROM devices WHERE id=? AND user_id=? AND revoked_at IS NULL').bind(id,p.userId).first())throw new ApiError(404,'device_not_found');
+  const rows=(await env.DB.prepare('SELECT action FROM device_permissions WHERE device_id=? ORDER BY action').bind(id).all<{action:string}>()).results;
+  return json({deviceId:id,actions:rows.map(row=>row.action)});
+ }
  if(/^\/v1\/devices\/[^/]+\/permissions$/.test(path)&&r.method==='PUT'){
   const input=await body(r,z.object({actions:z.array(deviceAction).max(3)}).strict());const id=path.split('/')[3];
   if(!await env.DB.prepare('SELECT id FROM devices WHERE id=? AND user_id=? AND revoked_at IS NULL').bind(id,p.userId).first())throw new ApiError(404,'device_not_found');

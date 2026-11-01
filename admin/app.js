@@ -679,14 +679,11 @@ async function navigate(id) {
   // Repeated navigation must not remember the temporary disabled state as permanent.
   if (target.getAttribute("aria-busy") === "true") return;
   target.setAttribute("aria-busy", "true");
-  const controls = [
-    ...target.querySelectorAll("input,textarea,select,button"),
-  ].map((node) => ({ node, disabled: node.disabled }));
-  controls.forEach(({ node }) => (node.disabled = true));
+  target.inert = true;
   try {
     await loaders[id]?.();
   } finally {
-    controls.forEach(({ node, disabled }) => (node.disabled = disabled));
+    target.inert = false;
     target.removeAttribute("aria-busy");
   }
 }
@@ -1431,7 +1428,12 @@ $$("[data-atlas-kind]").forEach((b) =>
   ),
 );
 async function settings() {
-  const [s, d] = await Promise.all([api("/v1/settings"), api("/v1/devices")]);
+  const [s, d, notifications, capabilities] = await Promise.all([
+    api("/v1/settings"),
+    api("/v1/devices"),
+    api("/v1/notifications/subscription"),
+    api("/v1/capabilities"),
+  ]);
   settingsData = s;
   const f = $("#settings-form").elements;
   f.timezone.value = s.timezone;
@@ -1449,9 +1451,31 @@ async function settings() {
       (b.dataset.autonomy === "true") === !!s.preferences.proactive,
     ),
   );
-  renderDevices(d.devices);
+  await renderDevices(d.devices);
+  const notificationForm = $("#notification-form");
+  notificationForm.elements.url.value = notifications.subscription?.url || "";
+  notificationForm.elements.enabled.checked = !!notifications.subscription?.enabled;
+  const configured = !!capabilities.notifications?.configured;
+  notificationForm.querySelector("button").disabled = !configured;
+  $("#notification-state").textContent = configured
+    ? notifications.subscription?.enabled
+      ? "Entrega ativada para lembretes autorizados."
+      : "Entrega disponível, aguardando sua autorização."
+    : "Entrega externa indisponível até configurar a assinatura no ambiente seguro.";
 }
-function renderDevices(devices) {
+$("#notification-form").addEventListener(
+  "submit",
+  safe(async () => {
+    const data = formData("#notification-form");
+    await api("/v1/notifications/subscription", "PUT", {
+      url: data.url,
+      enabled: data.enabled === "on",
+    });
+    await settings();
+    notice("Preferência de entrega salva.");
+  }),
+);
+async function renderDevices(devices) {
   for (const selector of ["#device-list", "#integration-devices"]) {
     const root = clear(selector);
     for (const row of devices) {
@@ -1484,6 +1508,7 @@ function renderDevices(devices) {
   }
   for (const id of ["permissions-form", "command-form"]) {
     const select = $("#" + id).elements.deviceId;
+    const previous = select.value;
     select.replaceChildren();
     devices
       .filter((d) => !d.revoked_at)
@@ -1492,8 +1517,45 @@ function renderDevices(devices) {
         option.value = d.id;
         select.append(option);
       });
+    if ([...select.options].some((option) => option.value === previous))
+      select.value = previous;
+  }
+  await loadDevicePermissions();
+}
+async function loadDevicePermissions() {
+  const form = $("#permissions-form"), id = form.elements.deviceId.value;
+  const state = $("#permission-state");
+  for (const action of ["show_notification", "open_panel", "report_status"])
+    form.elements[action].checked = false;
+  form.querySelector("button").disabled = true;
+  if (!id) {
+    state.textContent = "Cadastre um dispositivo para definir permissões.";
+    return;
+  }
+  state.textContent = "Carregando permissões…";
+  try {
+    const result = await api(`/v1/devices/${id}/permissions`);
+    if (form.elements.deviceId.value !== id) return;
+    for (const action of result.actions) form.elements[action].checked = true;
+    state.textContent = result.actions.length
+      ? "Permissões atuais carregadas."
+      : "Este dispositivo ainda não tem ações autorizadas.";
+    form.querySelector("button").disabled = false;
+  } catch (error) {
+    state.textContent = "Não foi possível carregar as permissões. Tente novamente.";
+    throw error;
   }
 }
+const permissionState = el("p", "Selecione um dispositivo.", "muted");
+permissionState.id = "permission-state";
+$("#permissions-form").insertBefore(
+  permissionState,
+  $("#permissions-form button"),
+);
+$("#permissions-form").elements.deviceId.addEventListener(
+  "change",
+  safe(loadDevicePermissions),
+);
 async function events() {
   const [e, g, t, r] = await Promise.all(
     ["/v1/events", "/v1/goals", "/v1/tasks", "/v1/reminders"].map((path) =>
@@ -2068,6 +2130,7 @@ $("#permissions-form").addEventListener(
       ),
     });
     notice("Permissões do dispositivo atualizadas.");
+    await loadDevicePermissions();
   }),
 );
 $("#command-form").addEventListener(

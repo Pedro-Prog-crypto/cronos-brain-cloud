@@ -1,4 +1,4 @@
-# Interface CRONOS — 0.4.0
+# Interface CRONOS — 0.4.1
 
 O painel em `/admin` foi reconstruído seguindo as doze telas da imagem fornecida pelo usuário. Mantém a identidade azul/ciano/violeta, fundo espacial, navegação lateral, numeração, painéis, diagramas e divisão dos conteúdos. Ícones e cérebro são SVG; a galáxia é desenhada em Canvas. São reconstruções das ilustrações: sem os arquivos gráficos originais, não se alega identidade pixel a pixel.
 
@@ -35,3 +35,5 @@ As capturas usam uma conta isolada de testes. Não há atividades fictícias no 
 O cérebro permanece em repositório separado. Nenhum arquivo de `/workspace/Cronos` foi alterado.
 
 Capturas adicionais na largura aproximada da referência: [centro de comando](screenshots/reference-960-overview.png), [tempo](screenshots/reference-960-events.png), [proteção](screenshots/reference-960-settings.png) e [estúdio](screenshots/reference-960-tools.png).
+
+Na integração, selecionar um dispositivo carrega as permissões atuais da API antes de permitir alterações. A tela de proteção mostra a entrega de lembretes e permite ativá-la somente quando a assinatura do serviço está configurada; destinos continuam sujeitos à lista autorizada do servidor.

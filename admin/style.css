@@ -2334,3 +2334,4 @@ footer {
   .gateway-node { min-width: 70px; padding: 12px 6px; }
   .gateway-providers .status { display: none; }
 }
+.notification-settings{border-top:1px solid #183a5a;margin-top:12px;padding-top:9px;font-size:11px}.notification-settings summary{cursor:pointer;color:#b7cffa}.notification-settings form{padding-top:6px}.notification-settings p{font-size:10px}

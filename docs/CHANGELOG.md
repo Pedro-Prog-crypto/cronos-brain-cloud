@@ -1,5 +1,12 @@
 # Histórico de mudanças
 
+## 0.4.1 — 1 de novembro de 2026
+
+- Permissões existentes são carregadas ao selecionar um dispositivo antes de salvar mudanças.
+- Tela de proteção mostra e permite configurar a entrega de lembretes quando o servidor tem assinatura configurada.
+- 61 operações documentadas; testes locais e navegador revalidados.
+
+
 ## 0.4.0 — 1 de novembro de 2026
 
 - Painel espacial azul/violeta com as 12 páginas da imagem, navegação lateral, ilustrações vetoriais e atlas interativo.

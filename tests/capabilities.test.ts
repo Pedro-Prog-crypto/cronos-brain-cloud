@@ -43,7 +43,10 @@ test('capacidades multimodais, vetor e ações autorizadas',async t=>{
  await t.test('controle de dispositivo exige permissão específica e confirmação',async()=>{
   const command={deviceId:device,action:'show_notification',payload:'Aviso local',confirm:true};
   assert.equal((await req('/v1/commands','POST',command)).status,403);
+  assert.deepEqual((await req(`/v1/devices/${device}/permissions`)).data.actions,[]);
   await req(`/v1/devices/${device}/permissions`,'PUT',{actions:['show_notification']});
+  assert.deepEqual((await req(`/v1/devices/${device}/permissions`)).data.actions,['show_notification']);
+  assert.equal((await req(`/v1/devices/${crypto.randomUUID()}/permissions`)).status,404);
   const r=await req('/v1/commands','POST',command);assert.equal(r.status,201);assert.equal(r.data.executed,false);
   assert.equal((await req('/v1/commands')).data.commands[0].id,r.data.id);
   assert.equal((await req(`/v1/commands/${r.data.id}/result`,'POST',{status:'succeeded',result:'Exibido'})).status,200);

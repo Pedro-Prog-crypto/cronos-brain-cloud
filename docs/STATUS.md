@@ -1,6 +1,6 @@
-# Resultado por fase — versão 0.4.0
+# Resultado por fase — versão 0.4.1
 
-A versão 0.4.0 acrescenta os módulos que faltavam de mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
+As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.1 melhora os controles de permissão e entrega de lembretes no painel. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
 
 | Fase | Implementado e verificado localmente | Limites e configuração pendente |
 |---|---|---|
@@ -19,7 +19,7 @@ A versão 0.4.0 acrescenta os módulos que faltavam de mídia, pesquisa, vetores
 
 `npm run check`: TypeScript/build e 44 testes aprovados. Inferência, mídia remota e notificações são testadas com fixtures de transporte isoladas; extração de PDF, banco, indexação e cálculos são reais. Não existe provedor simulado no código de produção.
 
-`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 809 KiB comprimidos na versão 0.4.0. Não houve publicação. Migrações até 0006 aplicadas no banco local.
+`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 809 KiB comprimidos na última validação. Não houve publicação. Migrações até 0006 aplicadas no banco local.
 
 ## Bloqueio externo atual
 

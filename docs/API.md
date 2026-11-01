@@ -40,7 +40,7 @@ Metadados das memórias:
 
 Busca de memória usa FTS5 com palavras/prefixos e ignora acentos. Múltiplas palavras na busca devem estar presentes; a recuperação automática no chat classifica correspondências por relevância. Pontuação não é interpretada como operador de busca. Consultas vazias listam registros recentes; consultas apenas com pontuação retornam lista vazia. A migração 0003 reconstrói o índice dos dados existentes e instala triggers para mantê-lo atualizado. Busca vetorial está disponível pelas ferramentas de embedding quando configuradas. A deduplicação considera usuário, tipo, conteúdo normalizado e metadados, preservando a primeira origem.
 
-O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente demonstrativo em `client/brain.ts` mantém integração futura separada do Desktop. As 60 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
+O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente demonstrativo em `client/brain.ts` mantém integração futura separada do Desktop. As 61 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
 
 
 ## Operações adicionadas na v0.2
@@ -98,3 +98,5 @@ Agent run também aceita `toolInput`, `memory` ou `command` conforme o especiali
 ### Personalidade
 
 `GET /v1/personality` retorna `{preferences, saved}`. `PUT /v1/personality` exige owner e `{detail, formality, humor, language, format}`. Os três níveis são inteiros de 0 a 100. Idiomas: Português (Brasil), English, Español. Formatos: Markdown com exemplos, Texto simples, Passo a passo. As preferências ficam na memória semântica com origem `cronos:personality`, são versionadas e entram no backup existente. Alterações orientam a apresentação das próximas respostas e invalidam o cache; não treinam pesos de modelos.
+
+`GET /v1/devices/{id}/permissions` retorna as ações autorizadas do dispositivo pertencente à conta. A tela de integração consulta esse estado ao trocar de dispositivo; `PUT` substitui a lista somente após salvar.
