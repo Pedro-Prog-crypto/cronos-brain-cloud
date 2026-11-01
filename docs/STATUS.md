@@ -1,6 +1,6 @@
-# Resultado por fase — versão 0.3.0
+# Resultado por fase — versão 0.4.0
 
-A versão 0.3.0 acrescenta os módulos que faltavam de mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
+A versão 0.4.0 acrescenta os módulos que faltavam de mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
 
 | Fase | Implementado e verificado localmente | Limites e configuração pendente |
 |---|---|---|
@@ -13,13 +13,13 @@ A versão 0.3.0 acrescenta os módulos que faltavam de mídia, pesquisa, vetores
 | 7 — Autonomia | Agenda, metas, silêncio, recorrência, opt-in, Cron declarado a cada 15 min, fila de webhook assinado com tentativas limitadas | Publicar Cron; configurar receptor autorizado; extração automática de compromissos em chat e replanejamento ainda pendentes |
 | 8 — Multimodal | PDF real; conectores de visão, geração, transcrição, voz, áudio por transcrição, vídeo por quadros; feeds RSS/Atom e Commons | Serviços externos não validados; sem OCR, captura contínua, análise acústica ou cobertura integral de vídeo; notícias preservam datas/fontes, mas não têm veracidade garantida |
 | 9 — Integração | Cliente de API e executor por callbacks com permissões, fila, expiração e resultados | Desktop continua separado por instrução do usuário; aplicativo receptor precisa instalar os callbacks |
-| 10 — Auditoria | 43 testes locais passando; navegador desktop/celular; PDF extraído; build de publicação em dry-run | Auditoria independente, carga e testes reais de inferência, pesquisa, entrega externa e recuperação remota |
+| 10 — Auditoria | 44 testes locais passando; navegador desktop/celular; PDF extraído; build de publicação em dry-run | Auditoria independente, carga e testes reais de inferência, pesquisa, entrega externa e recuperação remota |
 
 ## Validação
 
-`npm run check`: TypeScript/build e 43 testes aprovados. Inferência, mídia remota e notificações são testadas com fixtures de transporte isoladas; extração de PDF, banco, indexação e cálculos são reais. Não existe provedor simulado no código de produção.
+`npm run check`: TypeScript/build e 44 testes aprovados. Inferência, mídia remota e notificações são testadas com fixtures de transporte isoladas; extração de PDF, banco, indexação e cálculos são reais. Não existe provedor simulado no código de produção.
 
-`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 777 KiB comprimidos na versão validada. Não houve publicação. Migrações até 0006 aplicadas no banco local.
+`npm run test:ui`: painel e extração de PDF real aprovados em navegador; layout validado em desktop/celular. `wrangler deploy --dry-run`: build válido, cerca de 809 KiB comprimidos na versão 0.4.0. Não houve publicação. Migrações até 0006 aplicadas no banco local.
 
 ## Bloqueio externo atual
 
@@ -28,3 +28,9 @@ Não existem `CLOUDFLARE_API_TOKEN`, `GROQ_API_KEY`, `CAPABILITY_API_KEY` ou con
 As capacidades multimodais exigem um serviço compatível escolhido e verificado pelo operador. Gratuidade não foi presumida. Não é possível concluir a validação real de todas as funções somente acrescentando arquivos ao repositório.
 
 Configuração e limites: [CAPACIDADES.md](CAPACIDADES.md) e [PUBLICACAO.md](PUBLICACAO.md).
+
+## Interface 0.4.0
+
+Doze páginas reconstruídas a partir da imagem: centro de comando, atlas, especialistas, modelos, tempo/autonomia, proteção, pesquisa, estúdio, continuidade, diagnóstico, personalidade e integração. Preferências de estilo persistem como memória semântica versionada e influenciam as respostas. As limitações externas da tabela continuam válidas.
+
+Layout verificado nas 12 páginas em 1440 px e 390 px, além de testes de edição/histórico, execução do Guardian, persistência do estilo e extração de PDF no navegador. Arte vetorial e galáxia são reconstruções, não recortes dos arquivos originais. Ver [INTERFACE.md](INTERFACE.md).

@@ -1,9 +1,9 @@
-# Auditoria de desenvolvimento v0.3.0
+# Auditoria de desenvolvimento v0.4.0
 
 ## Resultado observado
 
 - `npm run typecheck`: aprovado.
-- `npm test`: 43 testes aprovados, zero falhas.
+- `npm test`: 44 testes aprovados, zero falhas.
 - `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: aprovado, sem exceções JavaScript; desktop 1440 px e celular 390 px.
 - Migrações 0001 a 0006 aplicadas com sucesso no D1 local do Wrangler.
 - `git -C /workspace/Cronos status --porcelain`: vazio. O corpo não foi modificado.
@@ -48,3 +48,7 @@ Regressões mantidas desde a v0.2.1: amanhã com acento, datas ambíguas, palavr
 ## Novas verificações da v0.3.0
 
 PDF gerado no teste foi extraído de verdade. Visão, transcrição, síntese, geração, embedding e webhook usam HTTP/funções simuladas identificadas. Foram verificados invalidação de vetor após edição, bloqueio de ação sem permissão, resultado por dispositivo, assinatura HMAC, cooldown 429, parser de feeds sem entidades, rejeição de datas/hosts inválidos e sondagem de provedor. O teste de PDF produziu aviso de fonte padrão sem impedir a extração; suporte amplo a fontes e OCR não foi validado. Nenhuma inferência externa real ou entrega a terceiros foi executada.
+
+## Interface 0.4.0
+
+Navegador: 12 páginas em 1440 e 390 px sem overflow horizontal ou exceções JavaScript. Exercitados login/logout, memória/edição/histórico, atlas, gráfico, PDF real, filtro e execução de especialista local, persistência de personalidade entre páginas. A API de personalidade foi testada para limites de entrada, isolamento entre contas, bloqueio de leitor e histórico de versões. As capturas usam uma conta descartável de teste e não representam inferências externas.

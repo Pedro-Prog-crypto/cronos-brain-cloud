@@ -1,13 +1,2242 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CRONOS · Brain Cloud</title><link rel="stylesheet" href="/admin/style.css"><script src="/admin/app.js" defer></script></head><body>
-<header><div class="mark">C<span>•</span></div><div><strong>CRONOS</strong><small>BRAIN CLOUD / CENTRO DE CONTROLE</small></div><div id="connection" class="pill">Sessão encerrada</div><button id="logout" hidden>Sair</button></header>
-<main><section id="login" class="login"><p class="eyebrow">ACESSO PRIVADO</p><h1>Um lugar para<br>organizar o pensamento.</h1><p>Conecte um dispositivo autorizado para acessar as memórias e ferramentas do CRONOS.</p><form id="login-form"><label>ID do dispositivo<input name="deviceId" required autocomplete="username"></label><label>Credencial do dispositivo<input name="credential" type="password" required autocomplete="current-password"></label><button type="submit" class="primary">Conectar ao cérebro →</button></form><p class="muted">A credencial permanece no seu dispositivo. A sessão dura 15 minutos.</p></section>
-<div id="workspace" hidden><nav aria-label="Navegação"><button data-tab="overview" class="active">Visão geral</button><button data-tab="chat">Conversa</button><button data-tab="memory">Memórias</button><button data-tab="graph">Grafo</button><button data-tab="events">Agenda e metas</button><button data-tab="tools">Ferramentas</button><button data-tab="agents">Especialistas</button><button data-tab="settings">Configurações</button></nav>
-<section id="overview" class="tab"><p class="eyebrow">ESTADO OPERACIONAL</p><h1>Seu cérebro, em perspectiva.</h1><p class="muted">Dados reais da sua conta. Integrações indisponíveis aparecem explicitamente.</p><div id="metrics" class="metrics"></div><div class="grid"><article><h2>Provedores de inteligência</h2><div id="providers"></div></article><article><h2>Atividade e diagnóstico</h2><div id="diagnostics"></div></article></div><button id="refresh">Atualizar diagnóstico</button></section>
-<section id="chat" class="tab" hidden><p class="eyebrow">IDENTIDADE UNIFICADA</p><h1>Converse com CRONOS.</h1><div id="messages" class="messages" aria-live="polite"></div><form id="chat-form"><label>Mensagem<textarea name="message" required maxlength="8000" placeholder="O que vamos desenvolver hoje?"></textarea></label><div class="row"><label class="check"><input type="checkbox" name="remember">Guardar como memória episódica</label><label class="check"><input type="checkbox" name="complex">Análise com vários especialistas</label></div><button class="primary">Enviar</button><button type="button" id="new-chat">Nova conversa</button></form></section>
-<section id="memory" class="tab" hidden><p class="eyebrow">CONTEXTO PERSISTENTE</p><h1>O que vale lembrar.</h1><form id="search-form" class="row"><input name="q" placeholder="Buscar nas memórias" aria-label="Buscar nas memórias"><button>Buscar</button></form><div class="grid"><article><h2>Registrar memória</h2><form id="memory-form"><label>Tipo<select name="kind"><option value="semantic">Semântica — conhecimento</option><option value="episodic">Episódica — acontecimento</option><option value="temporal">Temporal — prazo</option><option value="procedural">Procedural — procedimento</option><option value="relational">Relacional — ligação</option></select></label><label>Conteúdo<textarea name="content" required maxlength="8000"></textarea></label><label>Origem<input name="source" value="user" required></label><label>Metadados JSON<textarea name="metadata" required>{"topics":["CRONOS"]}</textarea></label><p id="metadata-help" class="muted"></p><button class="primary">Guardar</button></form></article><article><h2>Memórias recuperadas</h2><div id="memory-list"></div></article></div></section>
-<section id="graph" class="tab" hidden><p class="eyebrow">CONHECIMENTO CONECTADO</p><h1>Conexões que fazem sentido.</h1><div class="row"><input id="graph-search" placeholder="Destacar um assunto" aria-label="Pesquisar nós"><button id="graph-refresh">Atualizar grafo</button><button id="graph-reset">Centralizar</button></div><p class="muted">Arraste os nós ou o fundo. Use a roda para ampliar. Selecione um assunto para ver suas relações.</p><div class="graph-wrap"><canvas id="graph-canvas" aria-label="Grafo interativo de conhecimento"></canvas><div id="graph-detail" aria-live="polite">Nenhum assunto selecionado.</div></div><div id="graph-accessible"></div></section>
-<section id="events" class="tab" hidden><p class="eyebrow">TEMPO E DIREÇÃO</p><h1>Prepare o próximo passo.</h1><div class="grid"><article><h2>Novo compromisso</h2><form id="event-form"><label>Assunto<input name="title" required maxlength="120"></label><label>Data e hora local<input name="dueAt" type="datetime-local" required></label><label class="check"><input type="checkbox" name="notify">Autorizar lembrete interno</label><button class="primary">Registrar</button></form><h2>Plano de preparação</h2><form id="plan-form"><label>Objetivo<input name="title" required></label><label>Prazo relativo<input name="expression" value="daqui a três semanas" required></label><button>Criar meta e etapas</button></form></article><article><h2>Compromissos</h2><div id="event-list"></div><h2>Metas e tarefas</h2><div id="goal-list"></div><div id="task-list"></div><h2>Lembretes</h2><button id="schedule">Verificar agora</button><div id="reminder-list"></div></article></div></section>
-<section id="tools" class="tab" hidden><p class="eyebrow">FERRAMENTAS REAIS</p><h1>Do conteúdo à compreensão.</h1><div class="grid"><article><h2>Analisar documento de texto</h2><form id="document-form"><label>Nome<input name="name" value="Documento" required></label><label>Arquivo TXT / Markdown<input name="file" type="file" accept=".txt,.md,text/plain,text/markdown"></label><label>Texto<textarea name="text" maxlength="24000" required></textarea></label><label class="check"><input name="summarize" type="checkbox">Solicitar resumo ao modelo conectado</label><button>Analisar documento</button></form></article><article><h2>Compor gráfico</h2><form id="chart-form"><label>Título<input name="title" value="Meu progresso" required></label><label>Dados JSON<textarea name="points" placeholder='[{"label":"Tema","value":10}]' required></textarea></label><button>Criar painel visual</button></form><h2>Inspecionar imagem PNG</h2><input id="image-file" type="file" accept="image/png" aria-label="Selecionar imagem PNG"><p class="muted">Inspeção local de formato e dimensões. Interpretação semântica depende de modelo visual.</p></article></div><article><h2>Multimodalidade e pesquisa</h2><p id="capability-status" class="muted">Os recursos externos exigem provedor configurado. PDF é processado localmente.</p><form id="media-form"><label>Função<select name="tool"><option value="document.pdf">Extrair texto de PDF</option><option value="vision.analyze">Interpretar imagem</option><option value="video.analyze">Analisar quadros de vídeo</option><option value="speech.transcribe">Transcrever áudio</option><option value="audio.analyze">Analisar transcrição de áudio</option><option value="speech.synthesize">Gerar voz</option><option value="image.generate">Gerar imagem</option><option value="news.search">Pesquisar notícias</option><option value="images.search">Pesquisar imagens com créditos</option><option value="memory.vector.search">Busca semântica de memórias</option></select></label><label>Pergunta, texto ou descrição<textarea name="prompt" placeholder="Descreva o que deseja analisar ou criar."></textarea></label><label>Arquivo (quando necessário)<input name="file" type="file" accept="application/pdf,image/*,audio/*,video/*"></label><label>Voz configurada no provedor<input name="voice" placeholder="Identificador da voz"></label><p class="muted">PDF, imagem e áudio: até 1 MB. Vídeo: amostragem local de até seis quadros; o vídeo completo não é enviado. O envio de mídia ao modelo ocorre ao clicar em Executar.</p><button class="primary">Executar</button></form></article><div id="tool-result" aria-live="polite"></div></section>
-<section id="agents" class="tab" hidden><p class="eyebrow">ESPECIALISTAS E CAPACIDADES</p><h1>Uma identidade. Várias funções.</h1><p class="muted">O estado de cada módulo reflete o que foi implementado. Um cadastro não equivale a um modelo conectado.</p><div id="agent-list" class="agent-grid"></div></section>
-<section id="settings" class="tab" hidden><p class="eyebrow">CONTROLE E PRIVACIDADE</p><h1>Você define os limites.</h1><div class="grid"><article><h2>Preferências</h2><form id="settings-form"><label>Fuso horário<input name="timezone" value="America/Sao_Paulo" required></label><label class="check"><input type="checkbox" name="proactive">Permitir sugestões proativas na conversa</label><div class="row"><label>Silêncio a partir das<input name="quietStart" type="number" min="0" max="23" value="22"></label><label>Até<input name="quietEnd" type="number" min="0" max="23" value="8"></label></div><label>Retenção de episódios em dias (0 = manter)<input type="number" name="retentionDays" min="0" max="3650" value="0"></label><p class="muted">Retenção maior que zero autoriza exclusão de episódios antigos pelo agendador.</p><label class="check"><input type="checkbox" name="backupEnabled">Backup automático no R2 configurado</label><button>Salvar preferências</button></form></article><article><h2>Dispositivos autorizados</h2><div id="device-list"></div><form id="device-form"><label>Nome<input name="name" required></label><label>Função<select name="role"><option value="reader">Leitura</option><option value="owner">Administração</option></select></label><button>Criar credencial</button></form><pre id="new-device" hidden></pre></article><article><h2>Backup e recuperação</h2><p>O backup contém dados pessoais. Guarde-o em local seguro.</p><button id="export">Exportar backup com checksum</button><label>Restaurar em conta vazia<input id="restore-file" type="file" accept="application/json,.json"></label><p class="muted">A restauração valida integridade e referências antes de gravar.</p><button id="restore">Restaurar backup selecionado</button></article><article class="danger"><h2>Excluir dados da conta</h2><p>A exclusão remove memórias, conversas e dispositivos. Backups baixados continuam sob seu controle.</p><label>Digite DELETE MY DATA<input id="delete-confirm" autocomplete="off"></label><button id="delete-account">Excluir definitivamente</button></article></div></section>
-</div></main><div id="notice" role="status" aria-live="polite" hidden></div><footer>CRONOS BRAIN CLOUD <span>Identidade constante. Controle seu.</span></footer></body></html>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#040b16" />
+    <title>CRONOS · Brain Cloud</title>
+    <link rel="stylesheet" href="/admin/style.css" />
+    <script src="/admin/app.js" defer></script>
+  </head>
+  <body>
+    <svg
+      class="symbol-bank"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <symbol id="i-home" viewBox="0 0 24 24">
+          <path d="M3 11 12 3l9 8M5 10v10h5v-6h4v6h5V10" />
+        </symbol>
+        <symbol id="i-agents" viewBox="0 0 24 24">
+          <path
+            d="M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 21v-4a6 6 0 0 1 12 0v4M17 4a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4v3"
+          />
+        </symbol>
+        <symbol id="i-memory" viewBox="0 0 24 24">
+          <path d="M4 4h16v16H4zM8 4v16M12 8h4m-4 4h4m-4 4h2" />
+        </symbol>
+        <symbol id="i-graph" viewBox="0 0 24 24">
+          <path
+            d="M6 7l12 3M6 7l4 12m8-9-8 9M6 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm12 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm-8 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+          />
+        </symbol>
+        <symbol id="i-models" viewBox="0 0 24 24">
+          <path d="m12 2 9 5v10l-9 5-9-5V7l9-5Zm0 10 9-5m-9 5L3 7m9 5v10" />
+        </symbol>
+        <symbol id="i-tools" viewBox="0 0 24 24">
+          <path d="m14 6 4-4 4 4-4 4m-4-4L4 16m0 0-2 6 6-2 12-12M4 16l4 4" />
+        </symbol>
+        <symbol id="i-tasks" viewBox="0 0 24 24">
+          <path d="M5 3h14v18H5zM8 8l1 1 2-3m2 2h3M8 14l1 1 2-3m2 2h3" />
+        </symbol>
+        <symbol id="i-auto" viewBox="0 0 24 24">
+          <path d="m12 2 3 5 6 2-2 6-7 7-7-7-2-6 6-2 3-5Zm0 6v8m-4-4h8" />
+        </symbol>
+        <symbol id="i-person" viewBox="0 0 24 24">
+          <path
+            d="M12 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM3 22v-2a9 9 0 0 1 18 0v2"
+          />
+        </symbol>
+        <symbol id="i-device" viewBox="0 0 24 24">
+          <path d="M3 3h18v13H3zM8 21h8m-4-5v5" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4Zm-4 10 3 3 5-6" />
+        </symbol>
+        <symbol id="i-pulse" viewBox="0 0 24 24">
+          <path d="M2 12h5l3-8 4 16 3-8h5" />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <path d="M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm5 12 7 7" />
+        </symbol>
+        <symbol id="i-studio" viewBox="0 0 24 24">
+          <path d="M3 4h18v16H3zM3 15l5-5 5 5 3-3 5 5M15 8h.01" />
+        </symbol>
+        <symbol id="i-link" viewBox="0 0 24 24">
+          <path
+            d="M10 14l4-4M8 16l-2 2a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m2 1 2-2a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0"
+          />
+        </symbol>
+        <symbol id="i-chat" viewBox="0 0 24 24">
+          <path d="M3 3h18v14H9l-6 4V3Zm4 6h10m-10 4h6" />
+        </symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24">
+          <path
+            d="M9 3h6l1 4 4 2v6l-4 2-1 4H9l-1-4-4-2V9l4-2 1-4Zm3 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"
+          />
+        </symbol>
+        <symbol id="i-database" viewBox="0 0 24 24">
+          <path
+            d="M3 6c0-5 18-5 18 0s-18 5-18 0Zm0 0v6c0 5 18 5 18 0V6M3 12v6c0 5 18 5 18 0v-6"
+          />
+        </symbol>
+        <symbol id="i-cloud" viewBox="0 0 24 24">
+          <path d="M6 19a5 5 0 0 1-1-10 7 7 0 0 1 13-2 6 6 0 0 1 0 12H6Z" />
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+          <path d="M5 2h9l5 5v15H5V2Zm9 0v6h5M8 12h8m-8 4h6" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L20 5" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4v6l4 2" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <path d="M5 10h14v12H5zM8 10V6a4 4 0 0 1 8 0v4m-4 5v3" />
+        </symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24">
+          <path d="M12 16V2m-5 5 5-5 5 5M3 15v6h18v-6" />
+        </symbol>
+        <symbol id="i-mic" viewBox="0 0 24 24">
+          <path
+            d="M8 3a4 4 0 0 1 8 0v8a4 4 0 0 1-8 0V3ZM4 10v1a8 8 0 0 0 16 0v-1m-8 9v3m-4 0h8"
+          />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="m7 3 14 9-14 9V3Z" />
+        </symbol>
+        <symbol id="i-brain" viewBox="0 0 24 24">
+          <path
+            d="M12 4C7-1 3 4 4 7-1 9 1 16 5 16c-1 5 5 7 7 3m0-15c5-5 9 0 8 3 5 2 3 9-1 9 1 5-5 7-7 3V4ZM7 7l2 3-3 3m11-6-2 3 3 3M8 16l4-3 4 3"
+          />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+          <path d="M12 4v16M4 12h16" />
+        </symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24">
+          <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M9 10v7m6-7v7" />
+        </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24">
+          <path
+            d="M20 8a9 9 0 0 0-16 0m16-6v6h-6M4 16a9 9 0 0 0 16 0M4 22v-6h6"
+          />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M3 12h18m-6-6 6 6-6 6" />
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+          <path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z" />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="cosmos" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/admin"
+        ><svg class="icon" aria-hidden="true"><use href="#i-brain" /></svg
+        ><span><strong>CRONOS</strong><small>BRAIN CLOUD</small></span></a
+      ><span class="topbar-caption">INTELIGÊNCIA CONECTADA</span>
+      <div id="connection" class="pill">Sessão encerrada</div>
+    </header>
+    <main>
+      <section id="login" class="login panel">
+        <p class="eyebrow">ACESSO PRIVADO</p>
+        <h1>Sua inteligência.<br /><em>Em outra dimensão.</em></h1>
+        <p>
+          Conecte um dispositivo autorizado para acessar as memórias e
+          ferramentas do CRONOS.
+        </p>
+        <form id="login-form">
+          <label
+            >ID do dispositivo<input
+              name="deviceId"
+              required
+              autocomplete="username" /></label
+          ><label
+            >Credencial do dispositivo<input
+              name="credential"
+              type="password"
+              required
+              autocomplete="current-password" /></label
+          ><button type="submit" class="primary">Conectar ao cérebro →</button>
+        </form>
+        <p class="muted">
+          A credencial permanece no seu dispositivo. A sessão dura 15 minutos.
+        </p>
+      </section>
+      <div id="workspace" hidden>
+        <aside class="sidebar">
+          <span class="nav-label">CENTRO DE CONTROLE</span>
+          <nav aria-label="Navegação principal">
+            <button data-tab="overview" class="active">
+              <svg class="icon" aria-hidden="true"><use href="#i-home" /></svg
+              ><span>Visão geral</span></button
+            ><button data-tab="agents" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-agents" /></svg
+              ><span>Especialistas (40)</span></button
+            ><button data-tab="memory" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-memory" /></svg
+              ><span>Memórias</span></button
+            ><button data-tab="graph" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-graph" /></svg
+              ><span>Grafo</span></button
+            ><button data-tab="models" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-models" /></svg
+              ><span>Modelos</span></button
+            ><button data-route="models" data-nav-alias="toolbox">
+              <svg class="icon" aria-hidden="true"><use href="#i-tools" /></svg
+              ><span>Ferramentas</span></button
+            ><button data-tab="events" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-tasks" /></svg
+              ><span>Tarefas</span></button
+            ><button data-route="events" data-nav-alias="autonomy">
+              <svg class="icon" aria-hidden="true"><use href="#i-auto" /></svg
+              ><span>Autonomia</span></button
+            ><button data-tab="personality" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-person" /></svg
+              ><span>Personalidade</span></button
+            ><button data-route="integration" data-nav-alias="devices">
+              <svg class="icon" aria-hidden="true"><use href="#i-device" /></svg
+              ><span>Dispositivos</span></button
+            ><button data-tab="settings" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-shield" /></svg
+              ><span>Segurança</span></button
+            ><button data-tab="diagnostics" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-pulse" /></svg
+              ><span>Diagnóstico</span></button
+            ><button data-tab="research" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-search" /></svg
+              ><span>Pesquisa e notícias</span></button
+            ><button data-tab="tools" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-studio" /></svg
+              ><span>Estúdio multimodal</span></button
+            ><button data-tab="integration" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-device" /></svg
+              ><span>Integração</span></button
+            ><button data-tab="chat" class="">
+              <svg class="icon" aria-hidden="true"><use href="#i-chat" /></svg
+              ><span>Conversa</span>
+            </button>
+          </nav>
+          <div class="sidebar-bottom">
+            <svg class="icon" aria-hidden="true"><use href="#i-shield" /></svg
+            ><span>Controle seu.<small>Identidade constante.</small></span>
+          </div>
+          <button id="logout" class="sidebar-logout" hidden>
+            Sair da sessão
+          </button>
+        </aside>
+        <div class="page-content">
+          <section id="overview" class="tab">
+            <div class="page-heading">
+              <span class="page-number">01</span>
+              <div>
+                <h1>Centro de comando</h1>
+                <p>Orquestração completa do CRONOS BRAIN CLOUD</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="command-grid">
+              <article class="panel">
+                <h2>Orquestração de solicitações</h2>
+                <p class="muted">
+                  Do pedido à resposta, com especialistas, memórias e
+                  verificações.
+                </p>
+                <div class="flow">
+                  <div class="flow-step">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-chat" /></svg
+                    ><strong>Pedido</strong
+                    ><small>Entrada do usuário ou de uma tarefa</small>
+                  </div>
+                  <span class="flow-arrow">→</span>
+                  <div class="flow-step">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-database" /></svg
+                    ><strong>Memórias</strong
+                    ><small>Recupera contexto relevante</small>
+                  </div>
+                  <span class="flow-arrow">→</span>
+                  <div class="flow-step">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-agents" /></svg
+                    ><strong>Especialistas</strong
+                    ><small>Seleciona e orquestra as capacidades</small>
+                  </div>
+                  <span class="flow-arrow">→</span>
+                  <div class="flow-step">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-shield" /></svg
+                    ><strong>Verificação</strong
+                    ><small>Verifica evidências e limitações</small>
+                  </div>
+                  <span class="flow-arrow">→</span>
+                  <div class="flow-step">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-file" /></svg
+                    ><strong>Resposta</strong
+                    ><small>Uma resposta, uma identidade</small>
+                  </div>
+                </div>
+                <button type="button" data-go="chat">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-chat" /></svg
+                  >Conversar com CRONOS
+                </button>
+              </article>
+              <article class="panel">
+                <h2>Conexão com CRONOS</h2>
+                <div class="connection-map">
+                  <div>
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-device" /></svg
+                    ><strong>Este dispositivo</strong
+                    ><small>Sessão autenticada</small
+                    ><span class="status good">Conectado</span>
+                  </div>
+                  <span class="duplex">⇄</span>
+                  <div>
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-cloud" /></svg
+                    ><strong>CRONOS BRAIN CLOUD</strong
+                    ><small>Modelos de inteligência</small
+                    ><span id="brain-status" class="status warn"
+                      >A configurar</span
+                    >
+                  </div>
+                </div>
+                <div class="stat-pairs">
+                  <span
+                    >API do cérebro<strong class="good"
+                      >Disponível</strong
+                    ></span
+                  ><span
+                    >Inferência<strong id="inference-state"
+                      >Sem teste</strong
+                    ></span
+                  ><span>Orçamento previsto<strong>R$ 0</strong></span
+                  ><span>Plano gratuito<strong>Exige validação</strong></span>
+                </div>
+              </article>
+            </div>
+            <div id="metrics" class="metrics"></div>
+            <article class="panel">
+              <h2>Tarefas recentes e eventos</h2>
+              <div class="panel-toolbar">
+                <span class="muted">Atividade real da sua conta</span>
+                <div class="segmented">
+                  <button
+                    type="button"
+                    data-activity-filter="Todos"
+                    class="active"
+                  >
+                    Todos</button
+                  ><button
+                    type="button"
+                    data-activity-filter="Tarefas"
+                    class=""
+                  >
+                    Tarefas</button
+                  ><button
+                    type="button"
+                    data-activity-filter="Verificações"
+                    class=""
+                  >
+                    Verificações</button
+                  ><button type="button" data-activity-filter="Falhas" class="">
+                    Falhas
+                  </button>
+                </div>
+                <button id="refresh">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-refresh" /></svg
+                  >Atualizar
+                </button>
+              </div>
+              <div id="activity-table" class="table-scroll"></div>
+            </article>
+            <div class="grid compact">
+              <article class="panel">
+                <h2>Provedores de inteligência</h2>
+                <div id="providers"></div>
+              </article>
+              <article class="panel">
+                <h2>Resumo operacional</h2>
+                <div id="diagnostics"></div>
+              </article>
+            </div>
+          </section>
+          <section id="graph" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">02</span>
+              <div>
+                <h1>Atlas de memórias</h1>
+                <p>Seu conhecimento organizado e interconectado</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="toolbar">
+              <div class="segmented">
+                <button data-atlas-kind="episodic">Episódica</button
+                ><button data-atlas-kind="semantic">Semântica</button
+                ><button data-atlas-kind="temporal">Temporal</button
+                ><button data-atlas-kind="procedural">Procedural</button
+                ><button data-atlas-kind="relational">Relacional</button>
+              </div>
+              <input
+                id="graph-search"
+                placeholder="Buscar um assunto…"
+                aria-label="Pesquisar nós"
+              /><button id="graph-reset">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-search" /></svg
+                >Centralizar</button
+              ><button id="graph-refresh">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-refresh" /></svg
+                >Atualizar</button
+              ><button type="button" data-go="settings">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-database" /></svg
+                >Backups
+              </button>
+            </div>
+            <div class="atlas-layout">
+              <div class="graph-wrap">
+                <canvas
+                  id="graph-canvas"
+                  aria-label="Grafo interativo de conhecimento"
+                ></canvas>
+                <div class="graph-caption">
+                  <span class="live-dot"></span> ATLAS DE CONHECIMENTO
+                  <small>Arraste para explorar · role para ampliar</small>
+                </div>
+                <div id="graph-detail" aria-live="polite">
+                  Selecione um assunto para explorar suas conexões.
+                </div>
+              </div>
+              <article class="panel atlas-info">
+                <h2>Memória selecionada</h2>
+                <div id="atlas-detail">
+                  <div class="empty">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-graph" /></svg
+                    ><strong>Explore suas conexões</strong
+                    ><span
+                      >Selecione um nó para consultar as memórias
+                      relacionadas.</span
+                    >
+                  </div>
+                </div>
+              </article>
+            </div>
+            <div id="graph-accessible"></div>
+          </section>
+          <section id="agents" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">03</span>
+              <div>
+                <h1>Especialistas</h1>
+                <p>40 especialistas para pensar, criar e executar com você</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="segmented">
+              <button type="button" data-agent-category="Todos" class="active">
+                Todos</button
+              ><button type="button" data-agent-category="Raciocínio" class="">
+                Raciocínio</button
+              ><button
+                type="button"
+                data-agent-category="Conhecimento"
+                class=""
+              >
+                Conhecimento</button
+              ><button
+                type="button"
+                data-agent-category="Multimodalidade"
+                class=""
+              >
+                Multimodalidade</button
+              ><button type="button" data-agent-category="Tecnologia" class="">
+                Tecnologia</button
+              ><button
+                type="button"
+                data-agent-category="Contexto pessoal"
+                class=""
+              >
+                Contexto pessoal</button
+              ><button type="button" data-agent-category="Memória" class="">
+                Memória</button
+              ><button type="button" data-agent-category="Operações" class="">
+                Operações
+              </button>
+            </div>
+            <div class="specialists-layout">
+              <article class="panel">
+                <h2>Equipe de especialistas</h2>
+                <input
+                  id="agent-search"
+                  placeholder="Buscar especialista…"
+                  aria-label="Buscar especialista"
+                />
+                <div class="agent-columns">
+                  <span>Especialista</span><span>Categoria</span
+                  ><span>Estado</span>
+                </div>
+                <div id="agent-list"></div>
+              </article>
+              <article class="panel">
+                <h2>Detalhes do especialista</h2>
+                <div id="agent-detail"></div>
+                <form id="agent-run-form">
+                  <label
+                    >Pedido ao especialista<textarea
+                      name="message"
+                      required
+                      placeholder="Descreva o que deseja realizar"
+                    ></textarea></label
+                  ><button class="primary">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-play" /></svg
+                    >Executar teste
+                  </button>
+                </form>
+                <div id="agent-run-result" aria-live="polite"></div>
+              </article>
+            </div>
+          </section>
+          <section id="models" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">04</span>
+              <div>
+                <h1>Modelos e ferramentas</h1>
+                <p>
+                  Conecte modelos, configure ferramentas e defina regras de uso
+                </p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="model-layout">
+              <article class="panel">
+                <h2>Model Gateway</h2>
+                <p class="muted">
+                  Rotas entre provedores, com fallback e limites de utilização.
+                </p>
+                <div class="gateway-diagram">
+                  <div class="gateway-node">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-device" /></svg
+                    ><strong>CRONOS</strong><small>Seleção</small>
+                  </div>
+                  <span class="flow-arrow">→</span>
+                  <div class="gateway-node core">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-brain" /></svg
+                    ><strong>Model Gateway</strong
+                    ><small>Roteamento inteligente</small>
+                  </div>
+                  <span class="branches">↗<br />→<br />↘</span>
+                  <div class="gateway-providers">
+                    <div>
+                      <span class="provider-logo orange">☁</span
+                      ><strong>Cloudflare</strong
+                      ><span class="status warn">Configuração segura</span>
+                    </div>
+                    <div>
+                      <span class="provider-logo white">groq</span
+                      ><strong>Groq</strong
+                      ><span class="status warn">Configuração segura</span>
+                    </div>
+                    <div>
+                      <span class="provider-logo violet">⇆</span
+                      ><strong>OpenRouter</strong
+                      ><span class="status warn">Configuração segura</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article class="panel">
+                <h2>Política de uso</h2>
+                <div class="policy-line">
+                  <span
+                    >Fallback automático<small
+                      >Quando há provedor compatível</small
+                    ></span
+                  ><span class="status good">Implementado</span>
+                </div>
+                <div class="policy-line">
+                  <span
+                    >Cache privado<small
+                      >Respostas de texto por usuário</small
+                    ></span
+                  ><span class="status good">Ativo</span>
+                </div>
+                <div class="policy-line">
+                  <span
+                    >Cotas gratuitas<small
+                      >Verificação por provedor</small
+                    ></span
+                  ><span class="status warn">A validar</span>
+                </div>
+                <div class="policy-line">
+                  <span
+                    >Configuração de credenciais<small
+                      >Somente no ambiente seguro</small
+                    ></span
+                  ><button type="button" data-go="diagnostics">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-pulse" /></svg
+                    >Diagnóstico
+                  </button>
+                </div>
+              </article>
+            </div>
+            <article class="panel">
+              <h2>Provedores configurados</h2>
+              <div id="model-providers" class="grid"></div>
+            </article>
+            <div class="grid">
+              <article class="panel">
+                <h2>Ferramentas integradas</h2>
+                <div id="model-tools"></div>
+              </article>
+              <article class="panel">
+                <h2>Enviar arquivo para análise</h2>
+                <div class="upload-zone">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-upload" /></svg
+                  ><strong>Documentos, imagens, áudio e vídeo</strong
+                  ><span>Explore seus arquivos no estúdio multimodal</span
+                  ><button type="button" data-go="tools">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-studio" /></svg
+                    >Abrir estúdio
+                  </button>
+                </div>
+              </article>
+            </div>
+          </section>
+          <section id="events" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">05</span>
+              <div>
+                <h1>Tempo e autonomia</h1>
+                <p>Planeje, acompanhe e automatize suas tarefas</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="toolbar">
+              <div class="segmented">
+                <button
+                  type="button"
+                  data-time-view="Linha do tempo"
+                  class="active"
+                >
+                  Linha do tempo</button
+                ><button type="button" data-time-view="Metas" class="">
+                  Metas</button
+                ><button type="button" data-time-view="Rotinas" class="">
+                  Rotinas</button
+                ><button
+                  type="button"
+                  data-time-view="Agentes autônomos"
+                  class=""
+                >
+                  Agentes autônomos
+                </button>
+              </div>
+              <span id="today-label" class="muted"></span>
+            </div>
+            <div class="time-layout">
+              <article class="panel">
+                <h2>Linha do tempo</h2>
+                <div class="toolbar">
+                  <button id="timeline-prev" aria-label="Dia anterior">‹</button
+                  ><button id="timeline-today">Hoje</button
+                  ><button id="timeline-next" aria-label="Próximo dia">›</button
+                  ><strong id="timeline-date"></strong>
+                </div>
+                <div id="timeline"></div>
+              </article>
+              <article class="panel">
+                <h2>Configurações de autonomia</h2>
+                <div class="autonomy-modes">
+                  <button data-autonomy="false">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-shield" /></svg
+                    ><strong>Reativa</strong
+                    ><small>Aguarda seus comandos</small></button
+                  ><button data-autonomy="true">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-star" /></svg
+                    ><strong>Proativa</strong
+                    ><small>Sugere a partir dos seus dados</small>
+                  </button>
+                </div>
+                <form id="settings-form">
+                  <label
+                    >Fuso horário<input
+                      name="timezone"
+                      value="America/Sao_Paulo"
+                      required /></label
+                  ><label class="check"
+                    ><input type="checkbox" name="proactive" />Permitir
+                    sugestões proativas na conversa</label
+                  >
+                  <div class="row">
+                    <label
+                      >Silêncio a partir das<input
+                        name="quietStart"
+                        type="number"
+                        min="0"
+                        max="23"
+                        value="22" /></label
+                    ><label
+                      >Até<input
+                        name="quietEnd"
+                        type="number"
+                        min="0"
+                        max="23"
+                        value="8"
+                    /></label>
+                  </div>
+                  <label
+                    >Retenção de episódios em dias (0 = manter)<input
+                      type="number"
+                      name="retentionDays"
+                      min="0"
+                      max="3650"
+                      value="0"
+                  /></label>
+                  <p class="muted">
+                    Retenção maior que zero autoriza exclusão de episódios
+                    antigos pelo agendador.
+                  </p>
+                  <label class="check"
+                    ><input type="checkbox" name="backupEnabled" />Backup
+                    automático no R2 configurado</label
+                  ><button>Salvar preferências</button>
+                </form>
+                <h2>Próximas ações</h2>
+                <div id="task-list"></div>
+              </article>
+              <div class="stack">
+                <article class="panel">
+                  <h2>Calendário</h2>
+                  <div id="calendar"></div>
+                </article>
+                <article class="panel">
+                  <h2>Novo compromisso</h2>
+                  <form id="event-form">
+                    <label
+                      >Assunto<input
+                        name="title"
+                        required
+                        maxlength="120" /></label
+                    ><label
+                      >Data e hora local<input
+                        name="dueAt"
+                        type="datetime-local"
+                        required /></label
+                    ><label class="check"
+                      ><input type="checkbox" name="notify" />Autorizar lembrete
+                      interno</label
+                    ><button class="primary">Registrar</button>
+                  </form>
+                </article>
+              </div>
+            </div>
+            <div class="grid">
+              <article class="panel">
+                <h2>Metas e planejamento</h2>
+                <form id="plan-form">
+                  <label>Objetivo<input name="title" required /></label
+                  ><label
+                    >Prazo relativo<input
+                      name="expression"
+                      value="daqui a três semanas"
+                      required /></label
+                  ><button>Criar meta e etapas</button>
+                </form>
+                <div id="goal-list"></div>
+              </article>
+              <article class="panel">
+                <h2>Compromissos e lembretes</h2>
+                <div id="event-list"></div>
+                <button id="schedule">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-refresh" /></svg
+                  >Verificar lembretes
+                </button>
+                <div id="reminder-list"></div>
+              </article>
+            </div>
+          </section>
+          <section id="settings" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">06</span>
+              <div>
+                <h1>Núcleo e proteção</h1>
+                <p>Segurança, dispositivos e controle da sua inteligência</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="security-layout">
+              <article class="panel">
+                <h2>Núcleo do CRONOS</h2>
+                <p class="muted">
+                  Sua inteligência, segura e sob seu controle.
+                </p>
+                <svg
+                  class="brain-art"
+                  viewBox="0 0 520 330"
+                  role="img"
+                  aria-label="Ilustração do cérebro CRONOS, circuits lumineux violets"
+                >
+                  <defs>
+                    <radialGradient id="brain-glow">
+                      <stop stop-color="#911dff" stop-opacity=".5" />
+                      <stop offset="1" stop-color="#5514dd" stop-opacity="0" />
+                    </radialGradient>
+                    <linearGradient id="brain-stroke">
+                      <stop stop-color="#13cfff" />
+                      <stop offset=".5" stop-color="#d0a2ff" />
+                      <stop offset="1" stop-color="#8027ff" />
+                    </linearGradient>
+                    <filter id="brain-bloom">
+                      <feGaussianBlur stdDeviation="3" />
+                    </filter>
+                  </defs>
+                  <ellipse
+                    cx="260"
+                    cy="170"
+                    rx="230"
+                    ry="150"
+                    fill="url(#brain-glow)"
+                  />
+                  <g fill="none" stroke="#7135f3" stroke-width="1" opacity=".7">
+                    <ellipse
+                      cx="260"
+                      cy="190"
+                      rx="218"
+                      ry="65"
+                      transform="rotate(-10 260 190)"
+                    />
+                    <ellipse
+                      cx="260"
+                      cy="190"
+                      rx="200"
+                      ry="63"
+                      transform="rotate(12 260 190)"
+                    />
+                    <ellipse
+                      cx="260"
+                      cy="190"
+                      rx="155"
+                      ry="100"
+                      transform="rotate(-25 260 190)"
+                    />
+                  </g>
+                  <g
+                    id="brain-lines"
+                    fill="#23104b"
+                    fill-opacity=".25"
+                    stroke="url(#brain-stroke)"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M259 71C239 35 209 43 197 58 166 44 139 65 140 88 108 84 93 113 103 135 74 152 89 185 110 189 101 221 128 241 152 232 160 257 197 254 211 238 238 260 263 240 259 216Z"
+                    />
+                    <path
+                      d="M263 71C283 35 313 43 325 58 356 44 383 65 382 88 414 84 429 113 419 135 448 152 433 185 412 189 421 221 394 241 370 232 362 257 325 254 311 238 284 260 259 240 263 216Z"
+                    />
+                    <path
+                      d="M197 58c-17 15-8 36 5 39s20-4 19-17m-81 8c18-8 38 9 32 24s-27 17-30 2m-39 21c20-8 31 9 24 24s-6 30 13 34m-30-4c7-14 28-18 37-5s5 28 18 30m-13 18c-3-20 22-30 34-12s23 8 25-3m48-114c-20-11-35 8-24 22s16 38-4 44m-33-71c-11 12-10 29 2 39s24-3 23-14m-51-11c10 9 3 21-6 27s-11 21 4 28m31-30c-11 12-1 31 15 29s24 10 18 23m-23 39c-10-13-1-30 11-29s23 3 26-10"
+                    />
+                    <path
+                      d="M325 58c17 15 8 36-5 39s-20-4-19-17m81 8c-18-8-38 9-32 24s27 17 30 2m39 21c-20-8-31 9-24 24s6 30-13 34m30-4c-7-14-28-18-37-5s-5 28-18 30m13 18c3-20-22-30-34-12s-23 8-25-3m-48-114c20-11 35 8 24 22s-16 38 4 44m33-71c11 12 10 29-2 39s-24-3-23-14m51-11c-10 9-3 21 6 27s11 21-4 28m-31-30c11 12 1 31-15 29s-24 10-18 23m23 39c10-13 1-30-11-29s-23 3-26-10M244 246l10 43 11 17 9-63"
+                    />
+                  </g>
+                  <use
+                    href="#brain-lines"
+                    filter="url(#brain-bloom)"
+                    opacity=".55"
+                  />
+                  <g fill="#00d4ff">
+                    <circle cx="55" cy="177" r="3" />
+                    <circle cx="449" cy="153" r="3" />
+                    <circle cx="360" cy="262" r="2" />
+                  </g>
+                </svg>
+                <h2>Conexão e fluxo de dados</h2>
+                <div class="security-flow">
+                  <span
+                    ><svg class="icon" aria-hidden="true">
+                      <use href="#i-device" /></svg
+                    >Este dispositivo</span
+                  ><span
+                    ><svg class="icon" aria-hidden="true">
+                      <use href="#i-lock" /></svg
+                    >Sessão protegida</span
+                  ><span
+                    ><svg class="icon" aria-hidden="true">
+                      <use href="#i-cloud" /></svg
+                    >Brain Cloud</span
+                  >
+                </div>
+              </article>
+              <div class="stack">
+                <article class="panel">
+                  <h2>Dispositivos autorizados</h2>
+                  <div id="device-list"></div>
+                  <button type="button" data-go="integration">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-plus" /></svg
+                    >Adicionar dispositivo
+                  </button>
+                </article>
+                <article class="panel">
+                  <h2>Segurança e permissões</h2>
+                  <div class="policy-line">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-shield" /></svg
+                    ><span
+                      >Credenciais por dispositivo<small
+                        >Acesso individual e revogável</small
+                      ></span
+                    >
+                  </div>
+                  <div class="policy-line">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-lock" /></svg
+                    ><span
+                      >Sessões com expiração<small>Até 15 minutos</small></span
+                    >
+                  </div>
+                  <button type="button" data-go="integration">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-tools" /></svg
+                    >Permissões de ferramentas
+                  </button>
+                </article>
+              </div>
+              <article class="panel">
+                <h2>Identidade e estilo</h2>
+                <div class="identity-mark">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-brain" /></svg
+                  ><strong>CRONOS</strong>
+                </div>
+                <p>Objetivo, educado e com humor discreto.</p>
+                <button type="button" data-go="personality">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-person" /></svg
+                  >Ajustar personalidade
+                </button>
+              </article>
+            </div>
+            <div class="grid">
+              <article class="panel">
+                <h2>Auditoria e integridade</h2>
+                <div class="audit-shortcuts">
+                  <button type="button" data-go="diagnostics">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-pulse" /></svg
+                    >Diagnóstico</button
+                  ><button type="button" data-go="memory">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-memory" /></svg
+                    >Versões de memórias
+                  </button>
+                </div>
+                <p class="muted">
+                  Backups pessoais incluem checksum para verificar a
+                  integridade.
+                </p>
+                <button id="export">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-upload" /></svg
+                  >Exportar backup</button
+                ><label
+                  >Restaurar em conta vazia<input
+                    id="restore-file"
+                    type="file"
+                    accept="application/json,.json" /></label
+                ><button id="restore">Restaurar backup selecionado</button>
+              </article>
+              <article class="panel danger">
+                <h2>Dados e privacidade</h2>
+                <p>
+                  Controle o que fica armazenado. A exclusão remove memórias,
+                  conversas e dispositivos desta conta.
+                </p>
+                <label
+                  >Para excluir, digite DELETE MY DATA<input
+                    id="delete-confirm"
+                    autocomplete="off" /></label
+                ><button id="delete-account" class="danger-button">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-trash" /></svg
+                  >Excluir definitivamente
+                </button>
+              </article>
+            </div>
+          </section>
+          <section id="research" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">07</span>
+              <div>
+                <h1>Pesquisa e notícias</h1>
+                <p>Busque, analise e acompanhe informações com suas fontes</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="segmented">
+              <button
+                type="button"
+                data-research-mode="Pesquisa"
+                class="active"
+              >
+                Pesquisa</button
+              ><button type="button" data-research-mode="Notícias" class="">
+                Notícias</button
+              ><button type="button" data-research-mode="Imagens" class="">
+                Imagens</button
+              ><button
+                type="button"
+                disabled
+                title="Esta capacidade ainda não está integrada"
+              >
+                Artigos acadêmicos</button
+              ><button
+                type="button"
+                disabled
+                title="Esta capacidade ainda não está integrada"
+              >
+                Fontes confiáveis</button
+              ><button
+                type="button"
+                disabled
+                title="Esta capacidade ainda não está integrada"
+              >
+                Tendências</button
+              ><button
+                type="button"
+                disabled
+                title="Esta capacidade ainda não está integrada"
+              >
+                Alertas</button
+              ><button
+                type="button"
+                disabled
+                title="Esta capacidade ainda não está integrada"
+              >
+                Monitoramento
+              </button>
+            </div>
+            <div class="research-layout">
+              <div class="stack">
+                <article class="panel">
+                  <h2>Faça sua pesquisa</h2>
+                  <form id="research-form">
+                    <div class="search-row">
+                      <input
+                        name="query"
+                        required
+                        minlength="2"
+                        maxlength="200"
+                        placeholder="O que você quer descobrir?"
+                        aria-label="Termo de pesquisa"
+                      /><button class="primary">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-search" /></svg
+                        >Pesquisar
+                      </button>
+                    </div>
+                    <p id="research-scope" class="muted">
+                      Pesquisa em fonte enciclopédica autorizada, com links de
+                      origem.
+                    </p>
+                  </form>
+                </article>
+                <article class="panel">
+                  <h2>Resultados encontrados</h2>
+                  <div id="research-results">
+                    <div class="empty">
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-search" /></svg
+                      ><strong>Sua próxima descoberta começa aqui</strong
+                      ><span
+                        >Pesquise um assunto para consultar as fontes
+                        disponíveis.</span
+                      >
+                    </div>
+                  </div>
+                </article>
+              </div>
+              <div class="stack">
+                <article class="panel">
+                  <h2>Resumo da pesquisa</h2>
+                  <span class="badge">Com referências</span>
+                  <div id="research-summary">
+                    <div class="empty">
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-brain" /></svg
+                      ><strong>Nenhuma pesquisa selecionada</strong
+                      ><span
+                        >O resumo utiliza apenas os resultados
+                        recuperados.</span
+                      >
+                    </div>
+                  </div>
+                  <button id="research-summarize">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-star" /></svg
+                    >Gerar resumo
+                  </button>
+                </article>
+                <article class="panel">
+                  <h2>Fontes e verificação</h2>
+                  <div id="research-sources"></div>
+                  <p class="muted">
+                    Datas e links preservados. A publicação de uma fonte não
+                    comprova todas as suas afirmações.
+                  </p>
+                  <button id="research-export">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-upload" /></svg
+                    >Exportar resultados
+                  </button>
+                </article>
+              </div>
+            </div>
+          </section>
+          <section id="tools" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">08</span>
+              <div>
+                <h1>Estúdio multimodal</h1>
+                <p>
+                  Analise múltiplas fontes e construa respostas com texto,
+                  imagem, áudio e referências
+                </p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="studio-layout">
+              <div class="stack">
+                <article class="panel">
+                  <h2>1. Fontes de entrada</h2>
+                  <p class="muted">
+                    Adicione documentos, imagens e áudio para análise.
+                  </p>
+                  <form id="media-form">
+                    <label
+                      >Função<select name="tool">
+                        <option value="document.pdf">
+                          Extrair texto de PDF
+                        </option>
+                        <option value="vision.analyze">
+                          Interpretar imagem
+                        </option>
+                        <option value="video.analyze">
+                          Analisar quadros de vídeo
+                        </option>
+                        <option value="speech.transcribe">
+                          Transcrever áudio
+                        </option>
+                        <option value="audio.analyze">
+                          Analisar transcrição de áudio
+                        </option>
+                        <option value="speech.synthesize">Gerar voz</option>
+                        <option value="image.generate">Gerar imagem</option>
+                        <option value="news.search">Pesquisar notícias</option>
+                        <option value="images.search">
+                          Pesquisar imagens com créditos
+                        </option>
+                        <option value="memory.vector.search">
+                          Busca semântica de memórias
+                        </option>
+                      </select></label
+                    ><label
+                      >Pergunta ou descrição<textarea
+                        name="prompt"
+                        placeholder="Descreva o que deseja analisar ou criar."
+                      ></textarea></label
+                    ><label class="upload-zone"
+                      ><svg class="icon" aria-hidden="true">
+                        <use href="#i-upload" /></svg
+                      ><strong>Arraste arquivos aqui ou selecione</strong
+                      ><span>PDF, texto, imagem, áudio ou vídeo</span
+                      ><input
+                        name="file"
+                        type="file"
+                        accept="application/pdf,image/*,audio/*,video/*"
+                    /></label>
+                    <p class="muted">
+                      PDF, imagem e áudio: até 1 MB. Vídeo: seis quadros. O
+                      envio ocorre ao executar.
+                    </p>
+                    <label
+                      >Voz configurada no provedor<input
+                        name="voice"
+                        placeholder="Identificador da voz" /></label
+                    ><button class="primary">Analisar arquivo</button>
+                  </form>
+                </article>
+                <article class="panel">
+                  <h2>2. Análise de imagem</h2>
+                  <p class="muted">Extraia informações e gere descrições.</p>
+                  <div id="image-preview" class="image-preview">
+                    <svg
+                      class="brain-art"
+                      viewBox="0 0 520 330"
+                      role="img"
+                      aria-label="Ilustração do cérebro CRONOS, circuits lumineux violets"
+                    >
+                      <defs>
+                        <radialGradient id="studio-brain-glow">
+                          <stop stop-color="#911dff" stop-opacity=".5" />
+                          <stop
+                            offset="1"
+                            stop-color="#5514dd"
+                            stop-opacity="0"
+                          />
+                        </radialGradient>
+                        <linearGradient id="studio-brain-stroke">
+                          <stop stop-color="#13cfff" />
+                          <stop offset=".5" stop-color="#d0a2ff" />
+                          <stop offset="1" stop-color="#8027ff" />
+                        </linearGradient>
+                        <filter id="studio-brain-bloom">
+                          <feGaussianBlur stdDeviation="3" />
+                        </filter>
+                      </defs>
+                      <ellipse
+                        cx="260"
+                        cy="170"
+                        rx="230"
+                        ry="150"
+                        fill="url(#studio-brain-glow)"
+                      />
+                      <g
+                        fill="none"
+                        stroke="#7135f3"
+                        stroke-width="1"
+                        opacity=".7"
+                      >
+                        <ellipse
+                          cx="260"
+                          cy="190"
+                          rx="218"
+                          ry="65"
+                          transform="rotate(-10 260 190)"
+                        />
+                        <ellipse
+                          cx="260"
+                          cy="190"
+                          rx="200"
+                          ry="63"
+                          transform="rotate(12 260 190)"
+                        />
+                        <ellipse
+                          cx="260"
+                          cy="190"
+                          rx="155"
+                          ry="100"
+                          transform="rotate(-25 260 190)"
+                        />
+                      </g>
+                      <g
+                        id="studio-brain-lines"
+                        fill="#23104b"
+                        fill-opacity=".25"
+                        stroke="url(#studio-brain-stroke)"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M259 71C239 35 209 43 197 58 166 44 139 65 140 88 108 84 93 113 103 135 74 152 89 185 110 189 101 221 128 241 152 232 160 257 197 254 211 238 238 260 263 240 259 216Z"
+                        />
+                        <path
+                          d="M263 71C283 35 313 43 325 58 356 44 383 65 382 88 414 84 429 113 419 135 448 152 433 185 412 189 421 221 394 241 370 232 362 257 325 254 311 238 284 260 259 240 263 216Z"
+                        />
+                        <path
+                          d="M197 58c-17 15-8 36 5 39s20-4 19-17m-81 8c18-8 38 9 32 24s-27 17-30 2m-39 21c20-8 31 9 24 24s-6 30 13 34m-30-4c7-14 28-18 37-5s5 28 18 30m-13 18c-3-20 22-30 34-12s23 8 25-3m48-114c-20-11-35 8-24 22s16 38-4 44m-33-71c-11 12-10 29 2 39s24-3 23-14m-51-11c10 9 3 21-6 27s-11 21 4 28m31-30c-11 12-1 31 15 29s24 10 18 23m-23 39c-10-13-1-30 11-29s23 3 26-10"
+                        />
+                        <path
+                          d="M325 58c17 15 8 36-5 39s-20-4-19-17m81 8c-18-8-38 9-32 24s27 17 30 2m39 21c-20-8-31 9-24 24s6 30-13 34m30-4c-7-14-28-18-37-5s-5 28-18 30m13 18c3-20-22-30-34-12s-23 8-25-3m-48-114c20-11 35 8 24 22s-16 38 4 44m33-71c11 12 10 29-2 39s-24-3-23-14m51-11c-10 9-3 21 6 27s11 21-4 28m-31-30c11 12 1 31-15 29s-24 10-18 23m23 39c10-13 1-30-11-29s-23 3-26-10M244 246l10 43 11 17 9-63"
+                        />
+                      </g>
+                      <use
+                        href="#studio-brain-lines"
+                        filter="url(#studio-brain-bloom)"
+                        opacity=".55"
+                      />
+                      <g fill="#00d4ff">
+                        <circle cx="55" cy="177" r="3" />
+                        <circle cx="449" cy="153" r="3" />
+                        <circle cx="360" cy="262" r="2" />
+                      </g></svg
+                    ><small
+                      >Ilustração · selecione uma imagem para analisar</small
+                    >
+                  </div>
+                  <div class="toolbar">
+                    <button type="button" data-select-media="vision.analyze">
+                      Analisar imagem</button
+                    ><label class="sr-only"
+                      >Inspecionar PNG<input
+                        id="image-file"
+                        type="file"
+                        accept="image/png"
+                        aria-label="Selecionar imagem PNG"
+                    /></label>
+                  </div>
+                </article>
+                <article class="panel">
+                  <h2>3. Transcrição de áudio</h2>
+                  <p class="muted">Converta fala em texto.</p>
+                  <div class="waveform" aria-hidden="true">
+                    <i style="height: 8px"></i><i style="height: 25px"></i
+                    ><i style="height: 14px"></i><i style="height: 31px"></i
+                    ><i style="height: 20px"></i><i style="height: 9px"></i
+                    ><i style="height: 26px"></i><i style="height: 15px"></i
+                    ><i style="height: 32px"></i><i style="height: 21px"></i
+                    ><i style="height: 10px"></i><i style="height: 27px"></i
+                    ><i style="height: 16px"></i><i style="height: 33px"></i
+                    ><i style="height: 22px"></i><i style="height: 11px"></i
+                    ><i style="height: 28px"></i><i style="height: 17px"></i
+                    ><i style="height: 34px"></i><i style="height: 23px"></i
+                    ><i style="height: 12px"></i><i style="height: 29px"></i
+                    ><i style="height: 18px"></i><i style="height: 35px"></i
+                    ><i style="height: 24px"></i><i style="height: 13px"></i
+                    ><i style="height: 30px"></i><i style="height: 19px"></i
+                    ><i style="height: 8px"></i><i style="height: 25px"></i
+                    ><i style="height: 14px"></i><i style="height: 31px"></i
+                    ><i style="height: 20px"></i><i style="height: 9px"></i
+                    ><i style="height: 26px"></i><i style="height: 15px"></i
+                    ><i style="height: 32px"></i><i style="height: 21px"></i
+                    ><i style="height: 10px"></i><i style="height: 27px"></i
+                    ><i style="height: 16px"></i><i style="height: 33px"></i>
+                  </div>
+                  <p id="audio-file-state" class="muted">
+                    Nenhum áudio selecionado
+                  </p>
+                  <button type="button" data-select-media="speech.transcribe">
+                    Selecionar áudio
+                  </button>
+                </article>
+                <article class="panel">
+                  <h2>4. Síntese de voz</h2>
+                  <p class="muted">Converta seu texto em áudio.</p>
+                  <form id="voice-form">
+                    <label
+                      >Voz configurada<input
+                        name="voice"
+                        required
+                        placeholder="Identificador da voz" /></label
+                    ><label
+                      >Texto<textarea
+                        name="text"
+                        required
+                        maxlength="8000"
+                        placeholder="Escreva o texto para sintetizar…"
+                      ></textarea></label
+                    ><button>Gerar áudio</button>
+                  </form>
+                </article>
+                <article class="panel">
+                  <details>
+                    <summary>Análise de documento de texto</summary>
+                    <form id="document-form">
+                      <label
+                        >Nome<input
+                          name="name"
+                          value="Documento"
+                          required /></label
+                      ><label
+                        >Arquivo TXT / Markdown<input
+                          name="file"
+                          type="file"
+                          accept=".txt,.md,text/plain,text/markdown" /></label
+                      ><label
+                        >Texto<textarea
+                          name="text"
+                          maxlength="24000"
+                          required
+                        ></textarea></label
+                      ><label class="check"
+                        ><input name="summarize" type="checkbox" />Solicitar
+                        resumo ao modelo conectado</label
+                      ><button>Analisar documento</button>
+                    </form>
+                  </details>
+                </article>
+              </div>
+              <div class="stack">
+                <article class="panel">
+                  <h2>5. Composição da resposta</h2>
+                  <div class="editor-toolbar">
+                    <span>Parágrafo</span
+                    ><button
+                      type="button"
+                      data-editor="bold"
+                      aria-label="Negrito"
+                    >
+                      <b>B</b></button
+                    ><button
+                      type="button"
+                      data-editor="italic"
+                      aria-label="Itálico"
+                    >
+                      <i>I</i></button
+                    ><button
+                      type="button"
+                      data-editor="heading"
+                      aria-label="Título"
+                    >
+                      H</button
+                    ><button
+                      type="button"
+                      data-editor="list"
+                      aria-label="Lista"
+                    >
+                      ≡</button
+                    ><button
+                      type="button"
+                      data-editor="quote"
+                      aria-label="Citação"
+                    >
+                      ❞</button
+                    ><button
+                      type="button"
+                      data-editor="link"
+                      aria-label="Inserir link"
+                    >
+                      ↗</button
+                    ><span class="muted">Markdown</span>
+                  </div>
+                  <label class="sr-only" for="composition"
+                    >Composição da resposta</label
+                  ><textarea
+                    id="composition"
+                    placeholder="Seu espaço de composição. Resultados de análise podem ser inseridos aqui."
+                    maxlength="50000"
+                  ></textarea>
+                  <div id="tool-result" aria-live="polite">
+                    <div class="empty">
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-studio" /></svg
+                      ><strong>Pronto para criar</strong
+                      ><span
+                        >Execute uma ferramenta para visualizar o
+                        resultado.</span
+                      >
+                    </div>
+                  </div>
+                  <div class="toolbar">
+                    <button id="insert-result">Inserir resultado</button
+                    ><button id="clear-composition">Limpar texto</button
+                    ><button id="export-composition">
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-upload" /></svg
+                      >Exportar Markdown
+                    </button>
+                  </div>
+                </article>
+                <article class="panel">
+                  <h2>Geração de gráficos</h2>
+                  <form id="chart-form">
+                    <label
+                      >Título<input
+                        name="title"
+                        value="Meu progresso"
+                        required /></label
+                    ><label
+                      >Dados JSON<textarea
+                        name="points"
+                        placeholder='[{"label":"Tema","value":10}]'
+                        required
+                      ></textarea></label
+                    ><button>Criar painel visual</button>
+                  </form>
+                </article>
+              </div>
+              <div class="stack">
+                <article class="panel">
+                  <h2>6. Ferramentas disponíveis</h2>
+                  <div id="studio-capabilities"></div>
+                </article>
+                <article class="panel">
+                  <h2>7. Referências</h2>
+                  <div id="studio-references">
+                    <div class="empty">
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-link" /></svg
+                      ><strong>Sem referências</strong
+                      ><span
+                        >As fontes retornadas pelas ferramentas aparecem
+                        aqui.</span
+                      >
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+          <section id="memory" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">09</span>
+              <div>
+                <h1>Memória e continuidade</h1>
+                <p>
+                  Capture, organize e mantenha seu conhecimento vivo no CRONOS
+                  BRAIN CLOUD
+                </p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="toolbar">
+              <form id="search-form" class="row">
+                <input
+                  name="q"
+                  placeholder="Buscar nas memórias"
+                  aria-label="Buscar nas memórias"
+                /><button>Buscar</button>
+              </form>
+              <button type="button" data-go="graph">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-graph" /></svg
+                >Abrir atlas</button
+              ><button type="button" data-go="settings">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-database" /></svg
+                >Backups
+              </button>
+            </div>
+            <div class="memory-layout">
+              <article class="panel">
+                <h2>Tipos de memória</h2>
+                <div class="memory-types">
+                  <button data-memory-kind="episodic">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-clock" /></svg
+                    ><span
+                      ><strong>Memória episódica</strong
+                      ><small
+                        >Eventos, conversas e experiências com contexto</small
+                      ></span
+                    ><span>›</span></button
+                  ><button data-memory-kind="semantic">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-file" /></svg
+                    ><span
+                      ><strong>Memória semântica</strong
+                      ><small
+                        >Conceitos, conhecimentos e referências
+                        permanentes</small
+                      ></span
+                    ><span>›</span></button
+                  ><button data-memory-kind="temporal">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-clock" /></svg
+                    ><span
+                      ><strong>Memória temporal</strong
+                      ><small>Prazos e evolução de informações</small></span
+                    ><span>›</span></button
+                  ><button data-memory-kind="procedural">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-gear" /></svg
+                    ><span
+                      ><strong>Memória procedural</strong
+                      ><small
+                        >Procedimentos, tutoriais e como fazer tarefas</small
+                      ></span
+                    ><span>›</span></button
+                  ><button data-memory-kind="relational">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-graph" /></svg
+                    ><span
+                      ><strong>Memória relacional</strong
+                      ><small
+                        >Conexões entre conceitos, pessoas e projetos</small
+                      ></span
+                    ><span>›</span>
+                  </button>
+                </div>
+              </article>
+              <article class="panel">
+                <h2>Editar nota</h2>
+                <div id="editing-memory" class="muted">Nova memória</div>
+                <form id="memory-form">
+                  <label
+                    >Tipo<select name="kind">
+                      <option value="semantic">Semântica — conhecimento</option>
+                      <option value="episodic">
+                        Episódica — acontecimento
+                      </option>
+                      <option value="temporal">Temporal — prazo</option>
+                      <option value="procedural">
+                        Procedural — procedimento
+                      </option>
+                      <option value="relational">Relacional — ligação</option>
+                    </select></label
+                  ><label
+                    >Conteúdo<textarea
+                      name="content"
+                      required
+                      maxlength="8000"
+                    ></textarea></label
+                  ><label
+                    >Origem<input name="source" value="user" required /></label
+                  ><label
+                    >Metadados JSON<textarea name="metadata" required>
+{"topics":["CRONOS"]}</textarea
+                    >
+                  </label>
+                  <p id="metadata-help" class="muted"></p>
+                  <button class="primary">Guardar</button>
+                </form>
+                <button id="memory-new">Nova nota</button>
+              </article>
+              <article class="panel">
+                <h2>Grafo de memórias</h2>
+                <div class="mini-atlas">
+                  <canvas id="mini-graph" aria-label="Prévia do grafo"></canvas>
+                </div>
+                <button type="button" data-go="graph">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-graph" /></svg
+                  >Explorar conexões
+                </button>
+              </article>
+            </div>
+            <div class="memory-bottom">
+              <article class="panel">
+                <h2>Resultados de recuperação</h2>
+                <div id="memory-list"></div>
+              </article>
+              <article class="panel">
+                <h2>Histórico de versões</h2>
+                <div id="memory-history">
+                  <div class="empty">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-clock" /></svg
+                    ><strong>Nenhuma nota selecionada</strong
+                    ><span
+                      >Selecione Histórico em uma memória para consultar suas
+                      versões.</span
+                    >
+                  </div>
+                </div>
+              </article>
+              <article class="panel">
+                <h2>Consolidação e continuidade</h2>
+                <p>
+                  Compare possíveis conflitos sem alterar os registros
+                  originais.
+                </p>
+                <button id="memory-audit">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-shield" /></svg
+                  >Revisar memórias carregadas
+                </button>
+                <div id="memory-audit-result"></div>
+                <hr />
+                <h2>Retenção de memórias</h2>
+                <p class="muted">
+                  Defina a retenção de episódios nas preferências de autonomia.
+                </p>
+                <button type="button" data-go="events">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-gear" /></svg
+                  >Preferências
+                </button>
+              </article>
+            </div>
+          </section>
+          <section id="diagnostics" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">10</span>
+              <div>
+                <h1>Diagnóstico e limites</h1>
+                <p>
+                  Monitore integrações, analise requisições e gerencie limites
+                  de uso
+                </p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <article class="panel">
+              <h2>Status dos serviços e integrações</h2>
+              <div class="panel-toolbar">
+                <span class="muted"
+                  >Disponibilidade observada, sem presumir conexão com
+                  modelos.</span
+                ><button id="probe-all">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-play" /></svg
+                  >Testar provedores configurados
+                </button>
+              </div>
+              <div id="service-status" class="service-grid"></div>
+            </article>
+            <div class="research-layout">
+              <article class="panel">
+                <h2>Tráfego e requisições recentes</h2>
+                <div id="request-table" class="table-scroll"></div>
+              </article>
+              <article class="panel">
+                <h2>Latência observada</h2>
+                <div id="latency-chart"></div>
+              </article>
+            </div>
+            <div class="grid">
+              <article class="panel">
+                <h2>Orçamentos e limites</h2>
+                <div class="budget-cards">
+                  <div>
+                    <small>Orçamento previsto</small><strong>R$ 0</strong
+                    ><span class="status warn">Validar planos gratuitos</span>
+                  </div>
+                  <div>
+                    <small>Limite da API</small><strong>60 / minuto</strong
+                    ><span class="status">Por usuário</span>
+                  </div>
+                  <div>
+                    <small>Sessão</small><strong>15 minutos</strong
+                    ><span class="status">Expiração automática</span>
+                  </div>
+                </div>
+                <div id="usage-list"></div>
+              </article>
+              <article class="panel">
+                <h2>Histórico de falhas e alertas</h2>
+                <div id="failure-table" class="table-scroll"></div>
+              </article>
+            </div>
+          </section>
+          <section id="personality" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">11</span>
+              <div>
+                <h1>Personalidade e aprendizado</h1>
+                <p>
+                  Configure o estilo do CRONOS e acompanhe suas preferências
+                </p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="research-layout">
+              <div class="stack">
+                <article class="panel">
+                  <h2>Personalidade do CRONOS</h2>
+                  <p class="muted">
+                    Defina o tom, o estilo e as preferências de resposta.
+                  </p>
+                  <form id="personality-form">
+                    <div class="personality-sliders">
+                      <label
+                        ><svg class="icon" aria-hidden="true">
+                          <use href="#i-star" /></svg
+                        ><strong>Objetivo</strong
+                        ><small>Equilíbrio entre clareza e detalhes.</small
+                        ><input
+                          type="range"
+                          name="detail"
+                          min="0"
+                          max="100"
+                          value="70"
+                        />
+                        <div class="range-labels">
+                          <span>Mais conciso</span><output>70</output
+                          ><span>Mais detalhado</span>
+                        </div></label
+                      ><label
+                        ><svg class="icon" aria-hidden="true">
+                          <use href="#i-chat" /></svg
+                        ><strong>Educado</strong
+                        ><small>Nível de formalidade e cordialidade.</small
+                        ><input
+                          type="range"
+                          name="formality"
+                          min="0"
+                          max="100"
+                          value="80"
+                        />
+                        <div class="range-labels">
+                          <span>Mais direto</span><output>80</output
+                          ><span>Mais formal</span>
+                        </div></label
+                      ><label
+                        ><svg class="icon" aria-hidden="true">
+                          <use href="#i-person" /></svg
+                        ><strong>Humor discreto</strong
+                        ><small>Humor moderado e linguagem leve.</small
+                        ><input
+                          type="range"
+                          name="humor"
+                          min="0"
+                          max="100"
+                          value="30"
+                        />
+                        <div class="range-labels">
+                          <span>Sem humor</span><output>30</output
+                          ><span>Mais humor</span>
+                        </div></label
+                      >
+                    </div>
+                    <div class="grid compact">
+                      <label
+                        >Idioma preferido<select name="language">
+                          <option>Português (Brasil)</option>
+                          <option>English</option>
+                          <option>Español</option>
+                        </select></label
+                      ><label
+                        >Formato<select name="format">
+                          <option>Markdown com exemplos</option>
+                          <option>Texto simples</option>
+                          <option>Passo a passo</option>
+                        </select></label
+                      >
+                    </div>
+                    <button class="primary">Salvar preferências</button
+                    ><span id="personality-state" class="muted"></span>
+                  </form>
+                </article>
+                <article class="panel">
+                  <h2>Exemplo de resposta e correção</h2>
+                  <form id="style-test-form">
+                    <label
+                      >Pedido para comparar estilos<textarea
+                        name="message"
+                        required
+                        placeholder="Explique como ler um arquivo CSV em Python."
+                      ></textarea></label
+                    ><button>
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-play" /></svg
+                      >Gerar exemplo com o estilo salvo
+                    </button>
+                  </form>
+                  <div id="style-result"></div>
+                  <p class="muted">
+                    O exemplo depende de um modelo conectado. Preferências
+                    ajustam o contexto das respostas; não treinam os pesos do
+                    modelo.
+                  </p>
+                </article>
+              </div>
+              <div class="stack">
+                <article class="panel">
+                  <h2>Identidade e estilo</h2>
+                  <div class="identity-mark">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-brain" /></svg
+                    ><strong>CRONOS</strong
+                    ><small>Resposta unificada · Brain Cloud</small>
+                  </div>
+                  <ul class="identity-rules">
+                    <li>Tom consistente entre os especialistas</li>
+                    <li>Linguagem clara e profissional</li>
+                    <li>Sem alegação de consciência</li>
+                    <li>Foco em utilidade, precisão e segurança</li>
+                  </ul>
+                </article>
+                <article class="panel">
+                  <h2>Memória de preferências</h2>
+                  <p>
+                    As preferências são armazenadas na sua conta e aplicadas à
+                    conversa.
+                  </p>
+                  <button type="button" data-go="memory">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-memory" /></svg
+                    >Consultar memórias
+                  </button>
+                </article>
+                <article class="panel">
+                  <h2>Histórico de avaliação</h2>
+                  <div id="personality-history">
+                    <div class="empty">
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-chat" /></svg
+                      ><strong>Sem avaliações registradas</strong
+                      ><span
+                        >As correções podem ser registradas como memórias
+                        autorizadas.</span
+                      >
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+          <section id="integration" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">12</span>
+              <div>
+                <h1>Integração corpo–cérebro</h1>
+                <p>Conecte o CRONOS Desktop ao CRONOS BRAIN CLOUD</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="integration-layout">
+              <div class="stack">
+                <article class="panel">
+                  <h2>Dispositivos registrados</h2>
+                  <p class="muted">
+                    Gerencie os dispositivos autorizados a acessar o cérebro.
+                  </p>
+                  <div id="integration-devices"></div>
+                  <h2>Adicionar dispositivo</h2>
+                  <form id="device-form">
+                    <label>Nome<input name="name" required /></label
+                    ><label
+                      >Função<select name="role">
+                        <option value="reader">Leitura</option>
+                        <option value="owner">Administração</option>
+                      </select></label
+                    ><button>Criar credencial</button>
+                  </form>
+                  <pre id="new-device" hidden></pre>
+                </article>
+                <article class="panel">
+                  <h2>Permissões do dispositivo</h2>
+                  <form id="permissions-form">
+                    <label
+                      >Dispositivo<select
+                        name="deviceId"
+                        required
+                      ></select></label
+                    ><label class="check"
+                      ><input name="show_notification" type="checkbox" />Exibir
+                      notificações</label
+                    ><label class="check"
+                      ><input name="open_panel" type="checkbox" />Abrir
+                      painel</label
+                    ><label class="check"
+                      ><input name="report_status" type="checkbox" />Consultar
+                      estado</label
+                    >
+                    <p class="muted">
+                      Salvar substitui as permissões destas três ações.
+                    </p>
+                    <button>Salvar permissões</button>
+                  </form>
+                </article>
+              </div>
+              <div class="stack">
+                <article class="panel">
+                  <h2>Fluxo de integração</h2>
+                  <p class="muted">
+                    Comunicação entre dispositivos e a API autenticada do
+                    cérebro.
+                  </p>
+                  <div class="integration-flow">
+                    <div>
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-device" /></svg
+                      ><strong>CRONOS Desktop</strong
+                      ><small>Cliente separado</small>
+                    </div>
+                    <span
+                      >Requisições<br />→<br /><small>API REST / JSON</small
+                      ><br />←<br />Respostas</span
+                    >
+                    <div>
+                      <svg class="icon" aria-hidden="true">
+                        <use href="#i-cloud" /></svg
+                      ><strong>CRONOS BRAIN CLOUD</strong
+                      ><small>Memória e inteligência</small>
+                    </div>
+                  </div>
+                  <div class="module-strip">
+                    <span
+                      ><svg class="icon" aria-hidden="true">
+                        <use href="#i-agents" /></svg
+                      >40 especialistas</span
+                    ><span
+                      ><svg class="icon" aria-hidden="true">
+                        <use href="#i-database" /></svg
+                      >5 memórias</span
+                    ><span
+                      ><svg class="icon" aria-hidden="true">
+                        <use href="#i-graph" /></svg
+                      >Grafo</span
+                    ><span
+                      ><svg class="icon" aria-hidden="true">
+                        <use href="#i-tools" /></svg
+                      >Ferramentas</span
+                    >
+                  </div>
+                </article>
+                <article class="panel">
+                  <h2>Comando autorizado</h2>
+                  <form id="command-form">
+                    <label
+                      >Dispositivo<select
+                        name="deviceId"
+                        required
+                      ></select></label
+                    ><label
+                      >Ação<select name="action">
+                        <option value="show_notification">
+                          Exibir notificação
+                        </option>
+                        <option value="open_panel">Abrir painel</option>
+                        <option value="report_status">Consultar estado</option>
+                      </select></label
+                    ><label
+                      >Conteúdo<textarea
+                        name="payload"
+                        maxlength="2000"
+                      ></textarea></label
+                    ><label class="check"
+                      ><input
+                        name="confirm"
+                        type="checkbox"
+                        required
+                      />Autorizar este comando no dispositivo selecionado</label
+                    ><button class="primary">Enviar comando</button>
+                  </form>
+                  <div id="command-result"></div>
+                </article>
+              </div>
+              <article class="panel">
+                <h2>Saída estruturada</h2>
+                <p class="muted">
+                  Veja as informações da última resposta gerada nesta sessão.
+                </p>
+                <div id="structured-output">
+                  <div class="empty">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-file" /></svg
+                    ><strong>Nenhuma resposta nesta sessão</strong
+                    ><span
+                      >Converse com CRONOS para ver texto, memórias e eventos
+                      retornados.</span
+                    >
+                  </div>
+                </div>
+                <button type="button" data-go="chat">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-chat" /></svg
+                  >Abrir conversa
+                </button>
+              </article>
+            </div>
+          </section>
+          <section id="chat" class="tab" hidden>
+            <div class="page-heading">
+              <span class="page-number">✦</span>
+              <div>
+                <h1>Converse com CRONOS</h1>
+                <p>Uma identidade, todas as suas capacidades</p>
+              </div>
+              <span class="edition">CRONOS BRAIN CLOUD</span
+              ><button
+                type="button"
+                data-go="settings"
+                class="icon-button"
+                aria-label="Abrir segurança e configurações"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-gear" />
+                </svg>
+              </button>
+            </div>
+            <div class="chat-layout">
+              <article class="panel">
+                <h2>Sua conversa</h2>
+                <div id="messages" class="messages" aria-live="polite">
+                  <div class="empty">
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-brain" /></svg
+                    ><strong>O que vamos desenvolver hoje?</strong
+                    ><span
+                      >Converse, explore suas memórias ou planeje seu próximo
+                      passo.</span
+                    >
+                  </div>
+                </div>
+                <form id="chat-form">
+                  <label
+                    >Mensagem<textarea
+                      name="message"
+                      required
+                      maxlength="8000"
+                      placeholder="O que vamos desenvolver hoje?"
+                    ></textarea>
+                  </label>
+                  <div class="row">
+                    <label class="check"
+                      ><input type="checkbox" name="remember" />Guardar como
+                      memória episódica</label
+                    ><label class="check"
+                      ><input type="checkbox" name="complex" />Análise com
+                      vários especialistas</label
+                    >
+                  </div>
+                  <button class="primary">Enviar</button
+                  ><button type="button" id="new-chat">Nova conversa</button>
+                </form>
+              </article>
+              <article class="panel">
+                <h2>Contexto da resposta</h2>
+                <div class="identity-mark">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-brain" /></svg
+                  ><strong>CRONOS</strong>
+                </div>
+                <p>
+                  Suas memórias e especialistas conectados, em uma única
+                  conversa.
+                </p>
+                <button type="button" data-go="models">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-models" /></svg
+                  >Ver modelos</button
+                ><button type="button" data-go="integration">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-file" /></svg
+                  >Saída estruturada
+                </button>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
+    <footer>
+      <span>CRONOS BRAIN CLOUD</span
+      ><span>Conhecimento conectado. Possibilidades expandidas.</span
+      ><span>v0.4.0</span>
+    </footer>
+  </body>
+</html>

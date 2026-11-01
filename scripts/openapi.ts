@@ -1,3 +1,4 @@
+import {personalitySchema} from '../src/core/personality';
 import {commandSchema,deviceAction} from '../src/capabilities/actions';
 import { writeFileSync } from 'node:fs';
 import { z } from 'zod';
@@ -7,7 +8,7 @@ import { toolInput } from '../src/tools/registry';
 import { envelopeSchema } from '../src/storage/backup';
 const uuid=z.string().uuid(),text=z.string().min(1).max(8000),label=z.string().min(1).max(120);
 const schemas:Record<string,z.ZodType>={
-  ChatRequest:chatSchema,Memory:memorySchema,Event:eventSchema,SessionRequest:sessionSchema,Title:titleSchema,Settings:preferencesSchema,ToolInput:toolInput,Backup:envelopeSchema,
+  Personality:personalitySchema,ChatRequest:chatSchema,Memory:memorySchema,Event:eventSchema,SessionRequest:sessionSchema,Title:titleSchema,Settings:preferencesSchema,ToolInput:toolInput,Backup:envelopeSchema,
   MemoryUpdate:z.object({expectedVersion:z.number().int().positive(),memory:memorySchema}).strict(),
   MemoryReview:z.object({ids:z.array(uuid).min(1).max(10),mode:z.enum(['consolidate','audit'])}).strict(),
   Node:z.object({label,category:z.string().min(1).max(60)}).strict(),Edge:z.object({sourceId:uuid,targetId:uuid,relation:label,memoryId:uuid}).strict(),
@@ -21,6 +22,7 @@ const schemas:Record<string,z.ZodType>={
   ChatResponse:z.object({conversationId:uuid,text:z.string(),status:z.literal('completed'),components:z.array(z.object({type:z.literal('text'),text:z.string()})),sources:z.array(z.unknown()),memoriesUsed:z.array(z.string()),events:z.array(z.unknown()),toolsExecuted:z.array(z.unknown()),agentId:z.string(),selectedAgents:z.array(z.string()),provider:z.string(),cached:z.boolean(),warnings:z.array(z.string())}),
 };
 const routes:[string,string,string?,number?][]=[
+ ['get','/v1/personality'],['put','/v1/personality','Personality'],
  ['get','/v1/capabilities'],['post','/v1/providers/probe','ProviderProbe'],['put','/v1/devices/{id}/permissions','Permissions'],['get','/v1/commands'],['post','/v1/commands','Command',201],['post','/v1/commands/{id}/result','CommandResult'],['get','/v1/notifications/subscription'],['put','/v1/notifications/subscription','Subscription'],
  ['get','/v1/health'],['post','/v1/auth/sessions','SessionRequest',201],['post','/v1/auth/logout'],['post','/v1/chat','ChatRequest'],
  ['post','/v1/memory','Memory',201],['get','/v1/memory/search'],['put','/v1/memory/{id}','MemoryUpdate'],['delete','/v1/memory/{id}'],['get','/v1/memory/{id}/versions'],['post','/v1/memory/review','MemoryReview'],
@@ -43,6 +45,6 @@ for(const [method,path,schema,status=200] of routes){
  if(path==='/v1/chat')operation.description='Accept: text/event-stream ativa eventos progress, result e error. A inferência atual é bufferizada: não transmite tokens individualmente.';
  (paths[path]??={})[method]=operation;
 }
-const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.3.0',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
+const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.4.0',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
 writeFileSync('docs/openapi.json',JSON.stringify(document,null,2)+'\n');
 console.log(`${routes.length} operações documentadas em OpenAPI 3.1.`);

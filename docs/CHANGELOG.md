@@ -1,5 +1,15 @@
 # Histórico de mudanças
 
+## 0.4.0 — 1 de novembro de 2026
+
+- Painel espacial azul/violeta com as 12 páginas da imagem, navegação lateral, ilustrações vetoriais e atlas interativo.
+- Especialistas com busca, categorias, detalhes e execução; memória com edição inline e histórico; calendário, pesquisa, estúdio e integração.
+- Personalidade persistida em memória versionada, aplicada ao chat e aos especialistas textuais; cache considera o estilo.
+- Composição em Markdown, visualização legível dos resultados, seleção/arraste de arquivo e prévia local de imagem.
+- 44 testes aprovados; as 12 páginas verificadas no navegador em desktop/celular. Recursos ainda não integrados aparecem desabilitados ou a configurar.
+- GET/PUT /v1/personality; 60 operações documentadas.
+
+
 ## 0.3.0 — 1 de novembro de 2026
 
 - Conectores de visão, geração de imagem, transcrição, voz, análise de áudio por transcrição e vídeo por quadros.
