@@ -31,18 +31,26 @@ export class D1MemoryStore implements MemoryStore {
     await linkMemory(this.db,userId,id,input);
     return result;
   }
-  async relevant(userId:string,query:string) {
-    const words=[...new Set(query.toLocaleLowerCase('pt-BR').split(/[^\p{L}\p{N}]+/u).filter(w=>w.length>3))].slice(0,8);
-    if(!words.length) return [];
-    const rows=await Promise.all(words.map(word=>this.search(userId,word)));
-    const scores=new Map<string,{row:Record<string,unknown>;score:number}>();
-    for(const list of rows) for(const row of list as Record<string,unknown>[]) { const id=String(row.id); const old=scores.get(id); scores.set(id,{row,score:(old?.score??0)+1}); }
-    return [...scores.values()].sort((a,b)=>b.score-a.score).slice(0,6).map(v=>v.row);
+  private terms(query:string) {
+    return [...new Set(query.normalize('NFC').match(/[\p{L}\p{N}]+/gu)??[])].slice(0,24);
   }
-  async search(userId: string, query: string, kind?: string) {
-    const escaped = query.replace(/[!%_]/g, '!$&');
-    return (await this.db.prepare("SELECT * FROM memories WHERE user_id=? AND content LIKE ? ESCAPE '!' AND (? IS NULL OR kind=?) ORDER BY updated_at DESC LIMIT 30")
-      .bind(userId, `%${escaped}%`,kind ?? null,kind ?? null).all()).results;
+  async relevant(userId:string,query:string) {
+    const stop=new Set(['como','para','sobre','voce','você','cronos','lembra','pode','quero']);
+    const words=this.terms(query).filter(w=>w.length>3&&!stop.has(w.toLowerCase())).slice(0,8);
+    if(!words.length)return [];
+    return this.fulltext(userId,words,'OR',6);
+  }
+  private async fulltext(userId:string,words:string[],operator:'AND'|'OR',limit:number,kind?:string) {
+    // Tokens contain only letters/numbers. Quote every token: FTS syntax never comes from the caller.
+    const match=words.map(w=>`"${w}"*`).join(` ${operator} `);
+    return (await this.db.prepare(`SELECT m.* FROM memories_fts JOIN memories m ON m.rowid=memories_fts.rowid
+      WHERE memories_fts MATCH ? AND m.user_id=? AND (? IS NULL OR m.kind=?)
+      ORDER BY bm25(memories_fts),m.updated_at DESC,m.id LIMIT ?`)
+      .bind(match,userId,kind??null,kind??null,limit).all()).results;
+  }
+  async search(userId:string,query:string,kind?:string) {
+    if(!query.trim())return (await this.db.prepare('SELECT * FROM memories WHERE user_id=? AND (? IS NULL OR kind=?) ORDER BY updated_at DESC,id LIMIT 30').bind(userId,kind??null,kind??null).all()).results;
+    const words=this.terms(query);return words.length?this.fulltext(userId,words,'AND',30,kind):[];
   }
 }
 export async function audit(db: D1Database, userId: string, action: string, target: string) {

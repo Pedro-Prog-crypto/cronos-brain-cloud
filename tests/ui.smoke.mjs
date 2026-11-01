@@ -1,3 +1,4 @@
+import { migrate } from './migrate.mjs';
 import {readFileSync,mkdirSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
@@ -5,7 +6,7 @@ import { Miniflare } from 'miniflare';
 import { createHash,randomUUID } from 'node:crypto';
 const mf=new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'ui-smoke'},bindings:{PROVIDERS_JSON:'[]'}});
 const db=await mf.getD1Database('DB');
-for(const name of ['0001_foundation.sql','0002_operations.sql'])await db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8').replace(/\n/g,' '));
+await migrate(db);
 const credentials={deviceId:randomUUID(),credential:'f'.repeat(64)},userId=randomUUID();
 await db.prepare('INSERT INTO users(id) VALUES (?)').bind(userId).run();
 await db.prepare('INSERT INTO devices VALUES (?,?,?,?,?,NULL)').bind(credentials.deviceId,userId,'Browser test',createHash('sha256').update(credentials.credential).digest('hex'),'owner').run();

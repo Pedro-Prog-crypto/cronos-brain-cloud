@@ -96,7 +96,7 @@ export async function operations(r:Request,env:Env,p:Principal):Promise<Response
     if(!event)throw new ApiError(404,'event_not_found');
     const due=b.dueAt?new Date(b.dueAt).toISOString():String(event.due_at),status=b.status??String(event.status),repeat=b.recurrenceDays??Number(event.recurrence_days);
     const statements=[db.prepare('UPDATE events SET title=?,due_at=?,status=?,recurrence_days=?,notify=? WHERE id=? AND user_id=?').bind(b.title??event.title,due,status,repeat,b.notify===undefined?event.notify:Number(b.notify),id,p.userId)];
-    if(b.dueAt||status!=='active')statements.push(db.prepare('DELETE FROM reminders WHERE event_id=? AND user_id=?').bind(id,p.userId));
+    if(b.dueAt||status!=='active'||b.notify===false)statements.push(db.prepare('DELETE FROM reminders WHERE event_id=? AND user_id=?').bind(id,p.userId));
     if(status==='completed'&&event.status==='active'&&repeat>0) {
       const digest=await hash(`recurrence:${id}:${due}`);
       const nextId=`${digest.slice(0,8)}-${digest.slice(8,12)}-4${digest.slice(13,16)}-8${digest.slice(17,20)}-${digest.slice(20,32)}`;

@@ -10,7 +10,7 @@ O painel é uma aplicação estática servida pelo mesmo Worker em `/admin`. O s
 
 Intenção textual seleciona um especialista em pedidos comuns. `complex:true` executa até duas análises paralelas, uma crítica e uma síntese; portanto até quatro gerações, cada uma com no máximo dois candidatos. Falha da revisão retorna a análise bem-sucedida com aviso explícito. A resposta ao usuário mantém identidade CRONOS.
 
-O contexto inclui até dez mensagens truncadas e seis memórias recuperadas por termos. Esse algoritmo é lexical, não embeddings. O prompt declara relógio UTC, fuso e indisponibilidade de ferramentas de ação. Especialistas não recebem permissão para executar comandos. Memórias e documentos são dados não confiáveis.
+O contexto inclui até dez mensagens truncadas e seis memórias recuperadas por termos. A recuperação usa índice FTS5, normalização de acentos e ranking BM25; ainda é lexical, não embeddings. O índice acompanha criação, edição, exclusão e restauração via triggers. O prompt declara relógio UTC, fuso e indisponibilidade de ferramentas de ação. Especialistas não recebem permissão para executar comandos. Memórias e documentos são dados não confiáveis.
 
 Gateway requer configuração explícita recente (até 30 dias), cota gratuita verificada pelo operador, credencial e consentimento para contexto pessoal. Reserva solicitações atomicamente em D1. Timeout por tentativa: 12 segundos. 429 grava cooldown persistente, inclusive na mudança de dia. Não segue redirecionamentos. O cache de respostas é privado por usuário/contexto/configuração/tempo, tem validade de até 60 segundos e é invalidado pela edição de memória. SSE entrega progresso e resultado final, sem fingir transmissão token a token.
 
@@ -22,9 +22,9 @@ Consultas e referências de grafo são restritas ao proprietário. Canvas mostra
 
 ## Tempo e autonomia
 
-Datas ficam em UTC; preferências validam o fuso IANA. Expressões relativas suportam dias/semanas e amanhã, com precisão de dia e confirmação explícita do horário. O planejamento de prova cria meta, evento e três tarefas genéricas de preparação; não inventa conteúdos escolares nem progresso.
+Datas ficam em UTC; preferências validam o fuso IANA. Expressões relativas suportam dias/semanas, hoje, amanhã e depois de amanhã, com precisão de dia e confirmação explícita do horário. O planejamento de prova cria meta, evento e três tarefas genéricas de preparação; não inventa conteúdos escolares nem progresso.
 
-Scheduler consulta até 200 eventos por execução, cria lembretes internos opt-in para próximos três dias e respeita silêncio. A chamada manual fica restrita aos dados do usuário. O handler de Cron é global, mas nenhum gatilho de produção foi publicado. Recorrências de 1–366 dias criam a próxima ocorrência ao concluir a atual, com ID determinístico contra duplicação. São intervalos UTC; não representam recorrências de calendário com ajuste automático de horário de verão.
+Scheduler consulta até 200 eventos ainda sem lembrete por execução, ordenados pelo vencimento, cria lembretes internos opt-in para próximos três dias e respeita silêncio. A chamada manual fica restrita aos dados do usuário. O handler de Cron é global, mas nenhum gatilho de produção foi publicado. Recorrências de 1–366 dias criam a próxima ocorrência ao concluir a atual, com ID determinístico contra duplicação. São intervalos UTC; não representam recorrências de calendário com ajuste automático de horário de verão.
 
 Proatividade exige preferência explícita e lembrete real ainda não visto. Retenção opt-in apaga somente episódios antigos. Metas, tarefas e memória semântica não são descartadas por essa política.
 

@@ -2,7 +2,7 @@
 
 Backend e painel privado independentes do Cronos Desktop. Identidade da IA: **CRONOS**. Código em `/workspace/cronos-brain-cloud`; o repositório `/workspace/Cronos` permanece separado. Especificação original: [ESPECIFICACAO.md](docs/ESPECIFICACAO.md).
 
-Versão **0.2.0**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, ferramentas de documentos/gráficos/PNG, backup verificável com restauração e orquestração de especialistas. **28 testes automatizados e teste de navegador passaram.**
+Versão **0.2.1**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, ferramentas de documentos/gráficos/PNG, backup verificável com restauração e orquestração de especialistas. **34 testes automatizados e teste de navegador passaram.**
 
 Nenhum modelo externo está conectado neste ambiente. O sistema devolve indisponibilidade explícita quando precisa de inferência. O catálogo contém 40 funções; isso não significa 40 IAs operacionais. Veja o [estado de cada fase](docs/STATUS.md), incluindo funcionalidades ainda pendentes de implementação ou validação externa.
 
@@ -58,3 +58,15 @@ O ambiente não tem credenciais nem autorização de rede para Cloudflare ou pro
 - [API](docs/API.md) e [OpenAPI](docs/openapi.json)
 - [Cliente de integração independente](client/brain.ts)
 - [Auditoria e evidências](docs/AUDITORIA.md)
+
+## Atualizar uma instalação existente
+
+```sh
+git pull --ff-only
+npm ci
+npm run db:migrate
+npm run check
+npm run dev
+```
+
+A versão 0.2.1 adiciona o índice de busca pela migração 0003, incluindo memórias já armazenadas. Não recrie o dispositivo nem apague `.wrangler` ao atualizar. [Histórico de mudanças](docs/CHANGELOG.md).

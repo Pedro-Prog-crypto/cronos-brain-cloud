@@ -3,8 +3,8 @@
   "datasetMemories": 500,
   "queries": 30,
   "resultLimit": 30,
-  "p50Ms": 4.25,
-  "p95Ms": 9.68,
-  "maxMs": 9.77,
-  "measuredAt": "2026-11-01T02:53:52.296Z"
+  "p50Ms": 4.5,
+  "p95Ms": 11.44,
+  "maxMs": 12.21,
+  "measuredAt": "2026-11-01T13:26:32.940Z"
 }

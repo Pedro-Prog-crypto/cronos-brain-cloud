@@ -1,4 +1,4 @@
-# Resultado por fase — versão 0.2.0
+# Resultado por fase — versão 0.2.1
 
 O desenvolvimento avançou pelas partes locais das dez fases. **A especificação completa ainda não está concluída.** As dependências externas estão desativadas; funções ausentes não foram apresentadas como operacionais. Nenhum arquivo do Cronos Desktop foi alterado.
 
@@ -13,13 +13,13 @@ O desenvolvimento avançou pelas partes locais das dez fases. **A especificaçã
 | 7 — Autonomia | Agenda, tarefas, metas, planejamento relativo, opt-in, silêncio por fuso, deduplicação, confirmação, recorrência ao concluir e sugestões na conversa; handler de agendamento | Cron Trigger publicado, notificações externas autorizadas, extração de compromissos do chat, semântica temporal abrangente e revisão automática de progresso |
 | 8 — Multimodal | Fluxo real de documento de texto → análise estrutural; dados → componente gráfico renderizado; PNG → dimensões; pesquisa Wikipedia implementada e desativada | Pesquisa validada na rede, notícias, PDFs, busca/criação de imagens, compreensão visual por IA, voz, áudio e vídeo; sem alegar análise semântica de PNG |
 | 9 — Integração | Cliente TypeScript e contrato OpenAPI versionado; corpo não precisa conhecer provedor | Conectar o Desktop permanece adiado conforme instrução expressa de manter separado |
-| 10 — Auditoria | TypeScript/build; 28 testes aprovados; teste real de navegador desktop/celular; recuperação, autorização e falhas verificadas | Auditoria independente, carga e segurança em produção, testes ao vivo de modelos e serviços externos |
+| 10 — Auditoria | TypeScript/build; 34 testes aprovados; teste real de navegador desktop/celular; recuperação, autorização e falhas verificadas | Auditoria independente, carga e segurança em produção, testes ao vivo de modelos e serviços externos |
 
 O painel oferece telas de visão geral, conversa, memórias, grafo, agenda/metas, ferramentas, especialistas e configurações. Não contém métricas ou respostas fictícias de provedores.
 
 ## Evidências
 
-`npm run check`: 28 testes passando, zero falhas. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: login, memória, grafo, composição de gráfico, 40 entradas do catálogo, responsividade e logout aprovados, sem exceções JavaScript. Migrações 0001 e 0002 aplicadas ao banco local. Detalhes em [AUDITORIA.md](AUDITORIA.md).
+`npm run check`: 34 testes passando, zero falhas. `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: login, memória, grafo, composição de gráfico, 40 entradas do catálogo, responsividade e logout aprovados, sem exceções JavaScript. Migrações 0001, 0002 e 0003 aplicadas ao banco local. Detalhes em [AUDITORIA.md](AUDITORIA.md).
 
 ## Dependências que impedem a validação final
 

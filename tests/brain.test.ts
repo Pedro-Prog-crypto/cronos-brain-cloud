@@ -8,16 +8,14 @@ import { hash } from '../src/auth/auth';
 import { relativeDate, schedule } from '../src/core/time';
 import { selectAgent, catalog } from '../src/agents/catalog';
 import { ModelGateway, HttpProvider, retrySeconds } from '../src/providers/gateway';
-const migration = readFileSync(new URL('../migrations/0001_foundation.sql',import.meta.url),'utf8');
-const migration2 = readFileSync(new URL('../migrations/0002_operations.sql',import.meta.url),'utf8');
+import { migrate } from './migrate.mjs';
 const user = '11111111-1111-4111-8111-111111111111';
 const device = '22222222-2222-4222-8222-222222222222';
 const credential = 'a'.repeat(64);
 function runtime(persist?: string) { return new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'test'},d1Persist:persist,bindings:{PROVIDERS_JSON:'[]'}}); }
 async function setup(mf: Miniflare) {
   const db = await mf.getD1Database('DB');
-  for (const sql of migration.split(';').map(s=>s.trim()).filter(Boolean)) await db.prepare(sql).run();
-  await db.exec(migration2.replace(/\n/g,' '));
+  await migrate(db);
   await db.prepare('INSERT INTO users(id) VALUES (?)').bind(user).run();
   await db.prepare('INSERT INTO devices VALUES (?,?,?,?,?,NULL)').bind(device,user,'test',await hash(credential),'owner').run();
   return db;

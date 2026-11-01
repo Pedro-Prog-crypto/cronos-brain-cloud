@@ -1,10 +1,11 @@
+import { migrate } from '../tests/migrate.mjs';
 import { Miniflare } from 'miniflare';
 import { readFileSync,writeFileSync } from 'node:fs';
 import { createHash,randomUUID } from 'node:crypto';
 const mf=new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'benchmark'},bindings:{PROVIDERS_JSON:'[]'}});
 try{
  const db=await mf.getD1Database('DB');
- for(const name of ['0001_foundation.sql','0002_operations.sql'])await db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8').replace(/\n/g,' '));
+ await migrate(db);
  const user=randomUUID(),device=randomUUID(),session='1'.repeat(64);
  await db.prepare('INSERT INTO users(id) VALUES (?)').bind(user).run();
  await db.prepare('INSERT INTO devices VALUES (?,?,?,?,?,NULL)').bind(device,user,'benchmark','disabled','owner').run();

@@ -1,11 +1,11 @@
-# Auditoria de desenvolvimento v0.2.0
+# Auditoria de desenvolvimento v0.2.1
 
 ## Resultado observado
 
 - `npm run typecheck`: aprovado.
-- `npm test`: 28 testes aprovados, zero falhas.
+- `npm test`: 34 testes aprovados, zero falhas.
 - `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: aprovado, sem exceções JavaScript; desktop 1440 px e celular 390 px.
-- Migrações 0001/0002 aplicadas com sucesso no D1 local do Wrangler.
+- Migrações 0001/0002/0003 aplicadas com sucesso no D1 local do Wrangler.
 - `git -C /workspace/Cronos status --porcelain`: vazio. O corpo não foi modificado.
 
 Os resultados de modelo nos testes são fixtures HTTP identificadas como tal. O sistema implantável não contém respostas de modelo simuladas. R2 nos testes é o emulador Miniflare, não armazenamento externo real. Capturas em `screenshots/` são artefatos de validação do painel com registros de teste isolados.
@@ -41,4 +41,6 @@ Inferência real, planos e limites gratuitos atuais, publicação HTTPS permanen
 
 ## Medição local
 
-Com 500 memórias e 30 buscas autenticadas, retornando até 30 registros: mediana 4,25 ms, p95 9,68 ms e máximo 9,77 ms. Execução em Miniflare local; não representa latência de produção, rede ou inferência. Resultado em `benchmark.json`; reproduzir com `node scripts/benchmark.mjs` após build.
+A medição atual usa 500 memórias e 30 buscas autenticadas. Resultados em `benchmark.json`; reproduzir com `node scripts/benchmark.mjs` após build. Miniflare local não representa latência de produção ou de inferência.
+
+Regressões da v0.2.1: amanhã com acento, datas ambíguas, palavras sem acentos e prefixos, migração de dados existentes, manutenção do índice em edições/exclusões, isolamento da busca, cancelamento de lembretes e avanço sobre 205 eventos sem duplicação.

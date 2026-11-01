@@ -103,7 +103,7 @@ async function route(r: Request, env: Env): Promise<Response> {
       }
     }
   }
-  if (path === '/v1/reminders' && method === 'GET') return json({items:(await env.DB.prepare('SELECT r.id,e.title,e.due_at FROM reminders r JOIN events e ON r.event_id=e.id WHERE r.user_id=? AND r.seen_at IS NULL AND e.status=\'active\' ORDER BY e.due_at').bind(p.userId).all()).results});
+  if (path === '/v1/reminders' && method === 'GET') return json({items:(await env.DB.prepare('SELECT r.id,e.title,e.due_at FROM reminders r JOIN events e ON r.event_id=e.id WHERE r.user_id=? AND r.seen_at IS NULL AND e.notify=1 AND e.status=\'active\' ORDER BY e.due_at').bind(p.userId).all()).results});
   if (path === '/v1/devices' && method === 'GET') return json({devices:(await env.DB.prepare('SELECT id,name,role,revoked_at FROM devices WHERE user_id=?').bind(p.userId).all()).results});
   if (/^\/v1\/devices\/[^/]+$/.test(path) && method === 'DELETE') {
     const id = path.split('/').pop()!;

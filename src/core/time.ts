@@ -1,9 +1,14 @@
 import { ApiError } from '../types';
 export function relativeDate(text: string, now = new Date()): string {
-  const normalized = text.toLowerCase().replace(/três/g,'3').replace(/duas|dois/g,'2').replace(/uma|um/g,'1');
-  const match = /daqui a (\d{1,3}) (dia|semana)s?/.exec(normalized);
-  const days = /\bamanhã\b/u.test(normalized) ? 1 : match ? Number(match[1]) * (match[2] === 'semana' ? 7 : 1) : 0;
-  if (!days || days > 366) throw new ApiError(422,'date_needs_clarification');
+  const normalized=text.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
+  const numbers:Record<string,number>={um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10};
+  const pattern=/(?<![\p{L}\p{N}])(?:depois de amanha|amanha|hoje|daqui a (\d{1,3}|um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez) (dia|semana)s?)(?![\p{L}\p{N}])/gu;
+  const matches=[...normalized.matchAll(pattern)];
+  if(matches.length!==1||/\bnao\b/.test(normalized))throw new ApiError(422,'date_needs_clarification');
+  const match=matches[0];
+  const amount=match[1] ? (numbers[match[1]]??Number(match[1])) : 0;
+  const days=match[0]==='hoje'?0:match[0]==='amanha'?1:match[0]==='depois de amanha'?2:amount*(match[2]==='semana'?7:1);
+  if(!Number.isFinite(now.getTime())||days>366||(days<=0&&match[0]!=='hoje'))throw new ApiError(422,'date_needs_clarification');
   return new Date(now.getTime()+days*86400000).toISOString();
 }
 export function quietNow(now:Date,timezone:string,start:number,end:number) {
@@ -14,7 +19,7 @@ export function quietNow(now:Date,timezone:string,start:number,end:number) {
 export async function schedule(db: D1Database, now = new Date(), userId:string|null = null) {
   const events=(await db.prepare(`SELECT e.id,e.user_id,u.timezone,p.quiet_start,p.quiet_end FROM events e
     JOIN users u ON e.user_id=u.id LEFT JOIN preferences p ON p.user_id=e.user_id
-    WHERE e.status='active' AND e.notify=1 AND e.due_at>=? AND e.due_at<=? AND (? IS NULL OR e.user_id=?) LIMIT 200`)
+    WHERE e.status='active' AND e.notify=1 AND e.due_at>=? AND e.due_at<=? AND (? IS NULL OR e.user_id=?) AND NOT EXISTS (SELECT 1 FROM reminders r WHERE r.event_id=e.id) ORDER BY e.due_at,e.id LIMIT 200`)
     .bind(now.toISOString(),new Date(now.getTime()+3*86400000).toISOString(),userId,userId).all<{id:string;user_id:string;timezone:string;quiet_start:number|null;quiet_end:number|null}>()).results;
   for(const e of events) {
     // Legacy users without preferences keep explicit event opt-in behavior.

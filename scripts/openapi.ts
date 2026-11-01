@@ -41,6 +41,6 @@ for(const [method,path,schema,status=200] of routes){
  if(path==='/v1/chat')operation.description='Accept: text/event-stream ativa eventos progress, result e error. A inferência atual é bufferizada: não transmite tokens individualmente.';
  (paths[path]??={})[method]=operation;
 }
-const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.2.0',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
+const document={openapi:'3.1.0',info:{title:'CRONOS BRAIN CLOUD',version:'0.2.1',description:'API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais.'},security:[{session:[]}],paths,components:{securitySchemes:{session:{type:'http',scheme:'bearer'}},schemas:Object.fromEntries(Object.entries(schemas).map(([name,s])=>[name,z.toJSONSchema(s,{io:'input'})]))}};
 writeFileSync('docs/openapi.json',JSON.stringify(document,null,2)+'\n');
 console.log(`${routes.length} operações documentadas em OpenAPI 3.1.`);

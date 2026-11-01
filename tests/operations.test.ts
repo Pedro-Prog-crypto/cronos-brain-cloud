@@ -1,3 +1,4 @@
+import { migrate } from './migrate.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -9,7 +10,7 @@ import { quietNow, schedule } from '../src/core/time';
 test('operações avançadas integradas no Worker/D1',async t=>{
   const mf=new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'operations'},r2Buckets:{BACKUPS:'backups'},bindings:{PROVIDERS_JSON:'[]',BACKUPS_ENABLED:'true'}});
   t.after(()=>mf.dispose());const db=await mf.getD1Database('DB');
-  for(const name of ['0001_foundation.sql','0002_operations.sql'])await db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8').replace(/\n/g,' '));
+  await migrate(db);
   const user=crypto.randomUUID(),device=crypto.randomUUID(),credential='d'.repeat(64);
   await db.prepare('INSERT INTO users(id) VALUES (?)').bind(user).run();
   await db.prepare('INSERT INTO devices VALUES (?,?,?,?,?,NULL)').bind(device,user,'owner',await hash(credential),'owner').run();

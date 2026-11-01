@@ -48,7 +48,7 @@ export async function chat(env: Env, p: Principal, input: {message:string;conver
   const prefs=await env.DB.prepare('SELECT proactive,quiet_start,quiet_end FROM preferences WHERE user_id=?').bind(p.userId).first<{proactive:number;quiet_start:number;quiet_end:number}>();
   let events:unknown[]=[];
   if(prefs?.proactive&&!quietNow(new Date(),p.timezone,prefs.quiet_start,prefs.quiet_end)) {
-    const reminders=(await env.DB.prepare("SELECT r.id,e.title,e.due_at FROM reminders r JOIN events e ON e.id=r.event_id WHERE r.user_id=? AND r.seen_at IS NULL AND e.status='active' ORDER BY e.due_at LIMIT 1").bind(p.userId).all()).results;
+    const reminders=(await env.DB.prepare("SELECT r.id,e.title,e.due_at FROM reminders r JOIN events e ON e.id=r.event_id WHERE r.user_id=? AND r.seen_at IS NULL AND e.notify=1 AND e.status='active' ORDER BY e.due_at LIMIT 1").bind(p.userId).all()).results;
     if(reminders.length){events=reminders;await env.DB.prepare('UPDATE reminders SET seen_at=? WHERE id=? AND user_id=?').bind(now,reminders[0].id,p.userId).run();}
   }
   return {conversationId:id,text:result.text,status:'completed',components:[{type:'text',text:result.text}],sources:[],memoriesUsed:memories.map(m=>m.id),events,toolsExecuted:[],agentId:agents[0],selectedAgents:agents,provider:result.provider,cached:!!cached,warnings};

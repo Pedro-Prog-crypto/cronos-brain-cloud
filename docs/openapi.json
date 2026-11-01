@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "CRONOS BRAIN CLOUD",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "API privada. Escritas exigem owner, exceto logout. Consulte API.md para limites operacionais."
   },
   "security": [

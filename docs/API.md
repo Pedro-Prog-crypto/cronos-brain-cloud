@@ -38,7 +38,7 @@ Metadados das memórias:
 - procedural (`procedural`): `{steps:[...],execution:"manual"}`;
 - relacional (`relational`): `{from,to,relation}`.
 
-Busca textual não executa SQL fornecido pelo usuário. `%`, `_` e `!` são tratados como texto. Não existe busca semântica vetorial ainda. A deduplicação considera usuário, tipo, conteúdo normalizado e metadados, preservando a primeira origem.
+Busca de memória usa FTS5 com palavras/prefixos e ignora acentos. Múltiplas palavras na busca devem estar presentes; a recuperação automática no chat classifica correspondências por relevância. Pontuação não é interpretada como operador de busca. Consultas vazias listam registros recentes; consultas apenas com pontuação retornam lista vazia. A migração 0003 reconstrói o índice dos dados existentes e instala triggers para mantê-lo atualizado. Não existe busca semântica vetorial ainda. A deduplicação considera usuário, tipo, conteúdo normalizado e metadados, preservando a primeira origem.
 
 O chat retorna JSON por padrão. `Accept: text/event-stream` envia eventos `progress`, `result` e `error`; a inferência é bufferizada, sem transmissão token a token. `complex: true` permite análise paralela, crítica e síntese. O chat emite componentes de texto; a ferramenta visual emite componentes de gráfico. O cliente demonstrativo em `client/brain.ts` mantém integração futura separada do Desktop. As 50 operações estão documentadas em `openapi.json`, gerado por `scripts/openapi.ts` com schemas de entrada. Algumas respostas administrativas permitem campos adicionais; o contrato de chat e backup possui schema específico.
 
