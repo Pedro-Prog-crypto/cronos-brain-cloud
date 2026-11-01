@@ -1,5 +1,11 @@
 # Histórico de mudanças
 
+## 0.4.2 — 1 de novembro de 2026
+
+- Iniciadores para Windows e macOS: instalam dependências, aplicam migrações locais, preparam o primeiro dispositivo e abrem o painel.
+- Instalação limpa validada até a resposta HTTP de saúde; a credencial permanece em arquivo local privado.
+
+
 ## 0.4.1 — 1 de novembro de 2026
 
 - Permissões existentes são carregadas ao selecionar um dispositivo antes de salvar mudanças.

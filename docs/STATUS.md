@@ -1,6 +1,6 @@
-# Resultado por fase — versão 0.4.1
+# Resultado por fase — versão 0.4.2
 
-As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.1 melhora os controles de permissão e entrega de lembretes no painel. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
+As versões anteriores acrescentaram mídia, pesquisa, vetores, notificações e controle autorizado de dispositivos. A versão 0.4.2 melhora os controles de permissão e entrega de lembretes no painel. **O sistema completo ainda não foi validado em produção.** Não há credenciais de nuvem ou modelos neste ambiente. Código implementado e teste com transporte simulado não equivalem a um serviço externo operacional.
 
 | Fase | Implementado e verificado localmente | Limites e configuração pendente |
 |---|---|---|
@@ -34,3 +34,7 @@ Configuração e limites: [CAPACIDADES.md](CAPACIDADES.md) e [PUBLICACAO.md](PUB
 Doze páginas reconstruídas a partir da imagem: centro de comando, atlas, especialistas, modelos, tempo/autonomia, proteção, pesquisa, estúdio, continuidade, diagnóstico, personalidade e integração. Preferências de estilo persistem como memória semântica versionada e influenciam as respostas. As limitações externas da tabela continuam válidas.
 
 Layout verificado nas 12 páginas em 1440 px e 390 px, além de testes de edição/histórico, execução do Guardian, persistência do estilo e extração de PDF no navegador. Arte vetorial e galáxia são reconstruções, não recortes dos arquivos originais. Ver [INTERFACE.md](INTERFACE.md).
+
+## Teste simplificado
+
+O iniciador local foi validado em instalação limpa com Node.js 24, npm, D1 e resposta HTTP. No Windows, abra `INICIAR-CRONOS.cmd` após extrair o ZIP. Node.js ainda precisa estar instalado e modelos externos não são ativados por esse iniciador.
