@@ -51,8 +51,8 @@ export class HttpProvider implements InferenceProvider {
 }
 export class ModelGateway {
   constructor(private env: Env, private fetcher: typeof fetch = (...args) => fetch(...args)) {}
-  async generate(messages: Message[], personalContext: boolean): Promise<{text:string;provider:string}> {
-    const candidates = configurations(this.env).filter(c => available(this.env,c) && (!personalContext || c.allowPersonalContext)).slice(0,2);
+  async generate(messages: Message[], personalContext: boolean, providerId?: string): Promise<{text:string;provider:string}> {
+    const candidates = configurations(this.env).filter(c => available(this.env,c) && (!personalContext || c.allowPersonalContext) && (!providerId || c.id === providerId)).slice(0,2);
     for (const config of candidates) {
       const day = new Date().toISOString().slice(0,10), now = Date.now();
       // Retry-After remains effective even when the daily quota bucket changes at midnight.

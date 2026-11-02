@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { readFile } from "node:fs/promises";
+import { discoverConnection } from "./connection-config.mjs";
 
 const file = process.argv[2];
 if (!file) {
-  console.error("Uso: node client/desktop-bridge.mjs cronos-desktop.json [--once]");
+  console.error("Uso: node client/desktop-bridge.mjs <arquivo-ou-pasta-extraída> [--once]");
   process.exit(2);
 }
-const config = JSON.parse(await readFile(file, "utf8"));
+const config = await discoverConnection(file);
 const base = new URL(config.baseUrl);
 if (base.protocol !== "https:" && !(base.protocol === "http:" && ["127.0.0.1", "localhost"].includes(base.hostname)))
   throw Error("A ponte exige HTTPS ou servidor local em 127.0.0.1/localhost.");

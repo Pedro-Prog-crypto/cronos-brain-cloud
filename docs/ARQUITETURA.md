@@ -10,7 +10,7 @@ O painel é uma aplicação estática servida pelo mesmo Worker em `/admin`. O s
 
 ## Conversa
 
-Intenção textual seleciona um especialista em pedidos comuns. `complex:true` executa até duas análises paralelas, uma crítica e uma síntese; portanto até quatro gerações, cada uma com no máximo dois candidatos. Falha da revisão retorna a análise bem-sucedida com aviso explícito. A resposta ao usuário mantém identidade CRONOS.
+Intenção textual seleciona instruções de especialistas; `complex:true` acrescenta perspectivas ao mesmo contexto enviado aos provedores. O chat consulta cada provedor habilitado e autorizado uma vez em paralelo. Nenhum modelo atua como juiz ou sintetizador final: a combinação determinística agrupa respostas integralmente idênticas e preserva as demais com sua origem, sem resolver contradições. Falhas parciais e resposta única são informadas, inclusive no cache. A identidade CRONOS, o histórico, as preferências e as memórias permanecem no armazenamento existente.
 
 O contexto inclui até dez mensagens truncadas e seis memórias recuperadas por termos. A recuperação usa índice FTS5, normalização de acentos e ranking BM25; ainda é lexical, não embeddings. O índice acompanha criação, edição, exclusão e restauração via triggers. O prompt declara relógio UTC, fuso e indisponibilidade de ferramentas de ação. Especialistas não recebem permissão para executar comandos. Memórias e documentos são dados não confiáveis.
 

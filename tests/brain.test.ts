@@ -163,20 +163,48 @@ test('expiração, limite de autenticação e exclusão definitiva',async t=>{
   assert.equal(limited.status,429); assert.equal(limited.headers.get('Retry-After'),'60');
 });
 
-test('orquestração complexa executa análise, crítica e síntese com orçamento limitado',async t=>{
+test('orquestração sem principal usa uma chamada por provedor e preserva sondagem',async t=>{
   const fetchMock=createFetchMock();fetchMock.disableNetConnect();
-  fetchMock.get('https://api.groq.com').intercept({path:'/openai/v1/chat/completions',method:'POST'}).reply(200,{choices:[{message:{content:'Análise de fixture para validação do fluxo'}}]}).times(5);
+  fetchMock.get('https://api.groq.com').intercept({path:'/openai/v1/chat/completions',method:'POST'}).reply(200,{choices:[{message:{content:'Análise de fixture para validação do fluxo'}}]}).times(2);
   const providers=[{id:'groq',model:'fixture-only',enabled:true,freeTierVerified:true,verifiedAt:new Date().toISOString(),dailyRequestLimit:5,allowPersonalContext:true}];
   const mf=new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'complex'},fetchMock,bindings:{PROVIDERS_JSON:JSON.stringify(providers),GROQ_API_KEY:'TEST-ONLY'}});
   t.after(()=>mf.dispose());const db=await setup(mf);const token=await login(mf);
   const result=await request(mf,'/v1/chat','POST',{message:'Compare dois caminhos para meu objetivo',complex:true},token);
   assert.equal(result.status,200);assert.equal(result.data.status,'completed');assert.deepEqual(result.data.selectedAgents,['01','02','04']);
   const executions=(await db.prepare('SELECT agent_id,status FROM agent_executions ORDER BY agent_id').all()).results;
-  assert.deepEqual(executions.map(e=>e.agent_id),['01','02','04','06']);assert.ok(executions.every(e=>e.status==='succeeded'));
-  assert.equal((await db.prepare('SELECT requests FROM provider_usage').first() as any).requests,4);
+  assert.deepEqual(executions.map(e=>e.agent_id),['ensemble']);assert.ok(executions.every(e=>e.status==='succeeded'));
+  assert.equal((await db.prepare('SELECT requests FROM provider_usage').first() as any).requests,1);
   await t.test('sondagem registra validação somente após resposta do provedor',async()=>{
     assert.equal((await request(mf,'/v1/providers/probe','POST',{id:'groq'},token)).status,200);
     assert.equal((await request(mf,'/v1/providers/status','GET',undefined,token)).data.providers[0].liveTested,true);
   });
+  fetchMock.assertNoPendingInterceptors();
+});
+
+test('ensemble consulta modelos distintos, preserva memória e tolera falha parcial',async t=>{
+  const fetchMock=createFetchMock();fetchMock.disableNetConnect();
+  for(const [origin,text] of [['https://api.groq.com','Perspectiva A'],['https://openrouter.ai','Perspectiva B']]){
+    const path=origin.includes('groq')?'/openai/v1/chat/completions':'/api/v1/chat/completions';
+    fetchMock.get(origin).intercept({path,method:'POST'})
+      .reply(200,{choices:[{message:{content:text}}]});
+    fetchMock.get(origin).intercept({path,method:'POST'}).reply(origin.includes('groq')?503:200,
+      origin.includes('groq')?{}:{choices:[{message:{content:'Parcial B'}}]});
+  }
+  const providers=['groq','openrouter'].map(id=>({id,model:`${id}-fixture`,enabled:true,freeTierVerified:true,verifiedAt:new Date().toISOString(),dailyRequestLimit:5,allowPersonalContext:true}));
+  const mf=new Miniflare({modules:true,scriptPath:'dist/worker.mjs',compatibilityDate:'2026-07-30',d1Databases:{DB:'ensemble'},fetchMock,bindings:{PROVIDERS_JSON:JSON.stringify(providers),GROQ_API_KEY:'TEST-ONLY',OPENROUTER_API_KEY:'TEST-ONLY'}});
+  t.after(()=>mf.dispose());const db=await setup(mf);const token=await login(mf);
+  await request(mf,'/v1/memory','POST',memory,token);
+  const result=await request(mf,'/v1/chat','POST',{message:'Projeto CRONOS'},token);
+  assert.equal(result.status,200);assert.equal(result.data.agentId,'ensemble');
+  assert.equal(result.data.provider,'groq+openrouter');
+  assert.ok(result.data.text.includes('Perspectiva A'));assert.ok(result.data.text.includes('Perspectiva B'));
+  assert.equal((await db.prepare('SELECT sum(requests) n FROM provider_usage').first() as any).n,2);
+  assert.equal(result.data.memoriesUsed.length,1);
+  const cached=await request(mf,'/v1/chat','POST',{message:'Projeto CRONOS'},token);
+  assert.equal(cached.data.cached,true);
+  const partial=await request(mf,'/v1/chat','POST',{message:'Outra questão CRONOS'},token);
+  assert.equal(partial.status,200);assert.equal(partial.data.text,'Parcial B');
+  assert.ok(partial.data.warnings.some((w:string)=>w.includes('parcial')));
+  assert.equal((await db.prepare('SELECT count(*) n FROM memories').first() as any).n,1);
   fetchMock.assertNoPendingInterceptors();
 });

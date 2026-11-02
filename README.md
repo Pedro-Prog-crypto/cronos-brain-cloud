@@ -2,7 +2,7 @@
 
 Backend e painel privado independentes do Cronos Desktop. Identidade da IA: **CRONOS**. Código em `/workspace/cronos-brain-cloud`; o repositório `/workspace/Cronos` permanece separado. Especificação original: [ESPECIFICACAO.md](docs/ESPECIFICACAO.md).
 
-Versão **0.4.4**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, PDF, conectores de voz/imagens/vídeo, pesquisa, memória vetorial, backup verificável com restauração e orquestração de especialistas. **46 testes automatizados e teste de navegador passaram.**
+Versão **0.4.4**: API Workers/D1 protegida, painel responsivo, cinco tipos de memória com histórico, grafo interativo, agenda, PDF, conectores de voz/imagens/vídeo, pesquisa, memória vetorial, backup verificável com restauração e orquestração de especialistas. **52 testes automatizados e teste de navegador passaram.**
 
 Nenhum modelo externo está conectado neste ambiente. O sistema devolve indisponibilidade explícita quando precisa de inferência. Os 40 especialistas possuem caminho de execução, mas isso não significa 40 IAs validadas com modelo real. Veja o [estado de cada fase](docs/STATUS.md), incluindo funcionalidades ainda pendentes de implementação ou validação externa.
 
@@ -54,7 +54,7 @@ Os testes de interface usam banco temporário isolado. Capturas de validação f
 - Documento TXT/Markdown, gráfico de dados fornecidos e inspeção de metadados PNG; resumo por IA exige modelo.
 - Backup JSON com SHA-256, restauração transacional em conta vazia, IDs remapeados; adaptador de backup R2 opt-in testado em emulador.
 - Gateway Cloudflare Workers AI/Groq/OpenRouter/compatível, timeout, até dois fallbacks, quota diária e Retry-After.
-- Conversas simples usam um especialista; complexas podem executar duas análises em paralelo, crítica e síntese. Cache privado curto e SSE de progresso/resultado.
+- Conversas consultam os provedores autorizados em paralelo; a combinação preserva perspectivas sem modelo principal. Cache privado curto e SSE de progresso/resultado.
 - Painel de diagnóstico, dispositivos, autonomia, dados, especialistas e ferramentas.
 
 ## Conectar ao CRONOS Desktop
@@ -92,3 +92,32 @@ A versão 0.4.4 inclui migrações até 0007 (busca, vetores, ações autorizada
 A versão 0.4.4 reúne as 12 telas do painel enviado pelo usuário, com tema espacial azul/violeta, atlas interativo, estúdio e preferências de personalidade persistentes. Consulte [INTERFACE.md](docs/INTERFACE.md) e as [capturas das telas](docs/screenshots/).
 
 Se o iniciador antigo parou em `C:\Program Files\nodejs\node.exe scripts/device-create.mjs`, atualize `scripts/start-local.mjs` pelo ZIP mais recente. Preserve a pasta `.wrangler` da instalação existente, que contém os dados e a credencial local.
+
+## Combinação de modelos sem modelo principal
+
+O chat consulta em paralelo cada provedor habilitado que autorize contexto pessoal,
+com a mesma identidade CRONOS, preferências, memórias recuperadas e histórico.
+Não há modelo juiz ou sintetizador final: uma combinação determinística agrupa
+respostas integralmente idênticas e mantém as demais perspectivas com sua origem.
+Ela não resolve contradições nem transforma concordância em verificação factual.
+Com apenas uma resposta, o resultado avisa que não há consenso; falhas parciais
+são informadas. Sem respostas válidas, a API retorna indisponibilidade.
+Limites diários, privacidade e bloqueios Retry-After continuam por provedor.
+Nenhuma migração ou redefinição de identidade/memória é necessária.
+
+Para configurar modelos localmente, execute `npm run models:configure` uma vez
+por provedor. O assistente pede modelo, autorização de contexto, confirmação do
+plano e chave com entrada oculta; mantém as demais configurações em `.dev.vars`
+ignorado pelo Git. Reinicie o servidor e verifique o provedor no painel.
+A configuração precisa de nova confirmação do plano após 30 dias. A chave local
+fica em arquivo privado; em produção, use `wrangler secret put` para as chaves e
+configure `PROVIDERS_JSON` no ambiente do Worker. Não envie chaves pelo chat.
+
+A ponte também aceita uma pasta extraída, por exemplo:
+`node client/desktop-bridge.mjs /caminho/da/pasta --once`.
+Ela encontra a conexão pelo conteúdo (`baseUrl`, `deviceId`, `credential`),
+independentemente do nome/extensão do arquivo ou da pasta/versão do ZIP.
+Exporte a conexão no painel e coloque-a nessa pasta. Se houver mais de uma,
+informe diretamente o arquivo desejado.
+A ponte autentica presença; integrar chat dentro do aplicativo Desktop requer
+adaptar o código do Desktop com `BrainClient`, e não é feito por renomear arquivos.

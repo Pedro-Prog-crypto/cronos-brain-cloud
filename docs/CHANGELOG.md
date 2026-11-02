@@ -57,3 +57,14 @@
 - O scheduler deixa de gastar seus lotes com eventos já notificados e avança por vencimento.
 - Testes de API: 34 aprovados. Painel validado novamente em desktop e celular.
 - Nenhuma integração paga foi ativada. IA externa e os demais itens pendentes seguem descritos em STATUS.md.
+
+## Combinação distribuída de modelos
+
+- Chat consulta cada provedor habilitado e autorizado em paralelo, sem modelo principal/juiz.
+- Combinação determinística mantém perspectivas e proveniência; não resolve contradições por inferência.
+- Falhas parciais e ausência de consenso ficam explícitas, inclusive no cache.
+- Assistente `npm run models:configure` grava chaves localmente com entrada oculta e mantém outras configurações.
+- Ponte encontra conexão por conteúdo em arquivo ou pasta extraída, sem nome/versão fixos.
+- Identidade, preferências, memórias e esquema do banco preservados.
+- Validação: typecheck, build, 52 testes e smoke de navegador nas 12 páginas desktop/mobile.
+- Integração dentro do aplicativo Desktop ainda depende de acesso ao código-fonte do ZIP enviado, maior que o limite de transferência de 32 MiB.

@@ -16,7 +16,8 @@
     "check": "npm run typecheck && npm test",
     "test:ui": "npm run build && node tests/ui.smoke.mjs",
     "docs:api": "node --import tsx scripts/openapi.ts",
-    "benchmark": "npm run build && node scripts/benchmark.mjs"
+    "benchmark": "npm run build && node scripts/benchmark.mjs",
+    "models:configure": "node scripts/configure-models.mjs"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",
